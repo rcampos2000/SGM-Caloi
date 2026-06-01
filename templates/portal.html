@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal · SGM Caloi</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--red:#d4232a;--blue:#1f3a8f;--ink:#1d2430;--muted:#6b7686;--line:#e6e9ef;--bg:#f3f5f9;--green:#15924c;--amber:#d68a12;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);}
+  a{text-decoration:none;color:inherit;}
+  .topbar{background:#fff;border-bottom:3px solid var(--red);padding:14px 28px;display:flex;
+    align-items:center;justify-content:space-between;box-shadow:0 2px 10px rgba(0,0,0,.05);}
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand .wm{font-family:'Arial Black',sans-serif;font-style:italic;font-weight:900;font-size:26px;
+    color:var(--red);-webkit-text-stroke:1.2px var(--blue);}
+  .brand .t{font-family:'Oswald',sans-serif;font-weight:700;font-size:15px;letter-spacing:1px;text-transform:uppercase;color:var(--ink);}
+  .top-r{font-size:12px;color:var(--muted);display:flex;gap:14px;align-items:center;}
+  .wrap{max-width:1180px;margin:0 auto;padding:26px 28px 50px;}
+  h1{font-family:'Oswald',sans-serif;font-size:22px;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:22px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px;
+    transition:.2s;position:relative;overflow:hidden;}
+  .card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c,var(--red));}
+  .card.on:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,0,0,.12);border-color:var(--c,var(--red));}
+  .card.off{opacity:.6;}
+  .ico{font-size:26px;}
+  .ttl{font-family:'Oswald',sans-serif;font-weight:600;font-size:15px;text-transform:uppercase;letter-spacing:.5px;}
+  .desc{font-size:12px;color:var(--muted);line-height:1.5;flex:1;}
+  .meta{display:flex;gap:14px;border-top:1px solid var(--line);padding-top:10px;}
+  .meta div{font-size:11px;color:var(--muted);} .meta b{font-family:'Oswald',sans-serif;font-size:17px;color:var(--ink);display:block;}
+  .tag{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:99px;
+    align-self:flex-start;background:#eef1f6;color:var(--muted);}
+  .tag.live{background:#e8f4ec;color:var(--green);}
+  .btn-out{background:#eef1f6;border:none;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:600;color:var(--ink);cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand"><span class="wm">CALOi</span><span class="t">SGM · Gestão de Manutenção</span></div>
+  <div class="top-r"><span>{{ usuario.nome if usuario else '' }}</span><span>{{ agora }}</span><a class="btn-out" href="/logout">Sair</a></div>
+</div>
+<div class="wrap">
+  <h1>Portal de Manutenção</h1>
+  <div class="sub">Caloi Norte SA · Distrito Industrial de Manaus</div>
+  <div class="grid">
+
+    <a class="card on" style="--c:var(--red)" href="{{ tpm_url }}" target="_blank" rel="noopener">
+      <div class="ico">🔧</div><div class="tag live">TPM · online</div>
+      <div class="ttl">OS de Manutenção</div>
+      <div class="desc">Registrar nova ordem de serviço no programa TPM (abre em nova aba).</div>
+    </a>
+
+    <a class="card on" style="--c:var(--blue)" href="/modulo/ordens">
+      <div class="ico">📊</div><div class="tag live">Dashboard</div>
+      <div class="ttl">KPIs / OS</div>
+      <div class="desc">Indicadores das OS: paradas, horas, MTTR, disponibilidade, equipamentos.</div>
+      <div class="meta"><div><b>{{ resumo.ordens.total }}</b>OS</div><div><b>{{ resumo.ordens.abertas }}</b>Abertas</div><div><b>{{ resumo.ordens.disponibilidade }}%</b>Disp.</div></div>
+    </a>
+
+    <a class="card on" style="--c:var(--green)" href="/modulo/plano-acao">
+      <div class="ico">✅</div><div class="tag live">Dashboard</div>
+      <div class="ttl">Plano de Ação</div>
+      <div class="desc">Ações pendentes/concluídas, peças necessárias, por setor e equipamento.</div>
+      <div class="meta"><div><b>{{ resumo.plano_acao.total }}</b>Ações</div><div><b>{{ resumo.plano_acao.abertas }}</b>Abertas</div></div>
+    </a>
+
+    {% for m in [
+      {'i':'💰','t':'Custos','d':'Custos de manutenção por OS, setor e período.'},
+      {'i':'🔩','t':'Peças de Reposição','d':'Estoque de peças por equipamento e consumo.'},
+      {'i':'📐','t':'Projetos','d':'Projetos CAPEX e melhorias estruturais.'},
+      {'i':'🔄','t':'Melhoria Contínua','d':'Kaizens, PDCA e resultados.'},
+      {'i':'⛑️','t':'Segurança','d':'NR-12, EPI, inspeções e ocorrências.'},
+      {'i':'👥','t':'Head Count','d':'Equipe, horas e competências.'},
+      {'i':'📁','t':'Documentos','d':'Procedimentos, manuais e registros SGI.'},
+      {'i':'📅','t':'Planejamento','d':'Agenda de preventivas e SLA.'} ] %}
+    <div class="card off" style="--c:var(--muted)">
+      <div class="ico">{{ m.i }}</div><div class="tag">Em breve</div>
+      <div class="ttl">{{ m.t }}</div><div class="desc">{{ m.d }}</div>
+    </div>
+    {% endfor %}
+
+  </div>
+</div>
+</body>
+</html>

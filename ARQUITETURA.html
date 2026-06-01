@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SGM Caloi · Arquitetura (blocos)</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--red:#d4232a;--blue:#1f3a8f;--ink:#1d2430;--muted:#6b7686;--line:#e6e9ef;--bg:#f3f5f9;
+    --green:#15924c;--amber:#d68a12;--purple:#7a5cc8;--card:#fff;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;padding:30px;}
+  h1{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:1px;font-size:24px;}
+  .sub{color:var(--muted);font-size:13px;margin:4px 0 26px;}
+  .col-title{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:2px;font-size:12px;
+    color:var(--muted);text-align:center;margin-bottom:12px;}
+  .flow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:26px;max-width:1180px;margin:0 auto;align-items:start;}
+  .box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px;
+    border-left:5px solid var(--c,var(--blue));box-shadow:0 2px 8px rgba(0,0,0,.05);}
+  .box .t{font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px;}
+  .box .d{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.5;}
+  .box .src{font-size:11px;margin-top:8px;color:var(--blue);font-weight:600;}
+  .box.future{opacity:.65;border-left-style:dashed;}
+  .box.future .src{color:var(--amber);}
+  .legend{max-width:1180px;margin:30px auto 0;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 20px;font-size:12px;color:var(--muted);line-height:1.8;}
+  .legend b{color:var(--ink);}
+  .arrow{text-align:center;color:var(--muted);font-size:20px;margin:-6px 0 6px;}
+  .pill{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:#e8f4ec;color:var(--green);text-transform:uppercase;letter-spacing:.5px;}
+  .pill.f{background:#fdf3e3;color:var(--amber);}
+</style>
+</head>
+<body>
+  <h1>🔧 SGM Caloi — Arquitetura em Blocos</h1>
+  <div class="sub">Como a capa (rosto) se liga aos módulos e de onde cada um pega os dados · atualizado automaticamente a cada acesso</div>
+
+  <div class="flow">
+    <!-- COLUNA 1: ENTRADA / CAPA -->
+    <div>
+      <div class="col-title">1 · Acesso & Capa</div>
+      <div class="box" style="--c:var(--ink)">
+        <div class="t">🔐 Login</div>
+        <div class="d">Autenticação (admin/gerente/viewer). Sessão Flask.</div>
+        <div class="src">templates/login.html</div>
+      </div>
+      <div class="arrow">▼</div>
+      <div class="box" style="--c:var(--red)">
+        <div class="t">🛞 Capa / Portal <span class="pill">ativo</span></div>
+        <div class="d">Roda 3D + peças mecânicas. Cada peça é um atalho para um módulo.</div>
+        <div class="src">rosto.html → rota /portal</div>
+      </div>
+    </div>
+
+    <!-- COLUNA 2: MÓDULOS / DASHBOARDS -->
+    <div>
+      <div class="col-title">2 · Módulos (dashboards)</div>
+      <div class="box" style="--c:var(--red)"><div class="t">📊 OS / KPIs <span class="pill">ativo</span></div>
+        <div class="d">Paradas, horas, MTTR, disponibilidade, equipamentos.</div><div class="src">/modulo/ordens</div></div>
+      <div class="box" style="--c:var(--green)"><div class="t">✅ Plano de Ação <span class="pill">ativo</span></div>
+        <div class="d">Ações, status, peças necessárias.</div><div class="src">/modulo/plano-acao</div></div>
+      <div class="box" style="--c:var(--blue)"><div class="t">👥 Head Count <span class="pill">ativo</span></div>
+        <div class="d">Horas, função, férias, capacitação, atividades por setor.</div><div class="src">/modulo/headcount · Colaboradores.xlsx + OS</div></div>
+      <div class="box" style="--c:var(--purple)"><div class="t">🔩 Peças <span class="pill">ativo</span></div>
+        <div class="d">Peças necessárias por equipamento/setor.</div><div class="src">/modulo/pecas</div></div>
+      <div class="box" style="--c:#4a7ab5"><div class="t">🔍 Histórico por TAG <span class="pill">ativo</span></div>
+        <div class="d">Histórico de OS por equipamento + ranking.</div><div class="src">/modulo/historico</div></div>
+      <div class="box future" style="--c:var(--amber)"><div class="t">💰 Custos <span class="pill f">futuro</span></div>
+        <div class="d">Custos de manutenção.</div><div class="src">Diretório de rede da empresa</div></div>
+      <div class="box future" style="--c:var(--amber)"><div class="t">📁 Documentos <span class="pill f">futuro</span></div>
+        <div class="d">Procedimentos, manuais, SGI.</div><div class="src">Diretório de rede da empresa</div></div>
+      <div class="box future" style="--c:var(--muted)"><div class="t">📐 Projetos · 🔄 Melhoria · ⛑️ Segurança · 📅 Planejamento <span class="pill f">futuro</span></div>
+        <div class="d">Dependem de planilha própria (upload) ou definição.</div><div class="src">/api/upload/&lt;modulo&gt;</div></div>
+    </div>
+
+    <!-- COLUNA 3: FONTES DE DADOS -->
+    <div>
+      <div class="col-title">3 · Fontes de dados</div>
+      <div class="box" style="--c:var(--red)"><div class="t">📗 Manutencao_TPM.xlsx <span class="pill">ativo</span></div>
+        <div class="d">Banco de OS (paradas). Gravado pelo <b>programa TPM</b>.</div>
+        <div class="src">…\Área de Trabalho\Manutencao_TPM\</div></div>
+      <div class="box" style="--c:var(--green)"><div class="t">📘 Plano_de_Acao.xlsx <span class="pill">ativo</span></div>
+        <div class="d">Ações e peças necessárias.</div>
+        <div class="src">…\Manutencao_TPM\</div></div>
+      <div class="box" style="--c:var(--blue)"><div class="t">👥 Colaboradores.xlsx <span class="pill">ativo</span></div>
+        <div class="d">Efetivo: função, setor, admissão, férias, capacitação. Editável no Excel do TPM.</div>
+        <div class="src">…\Manutencao_TPM\</div></div>
+      <div class="box" style="--c:var(--ink)"><div class="t">🌐 Programa TPM (Railway) <span class="pill">ativo</span></div>
+        <div class="d">Onde se registra a OS (ícone OS abre aqui).</div>
+        <div class="src">manutencao-tpm.up.railway.app</div></div>
+      <div class="box future" style="--c:var(--amber)"><div class="t">🗄️ Diretório de rede <span class="pill f">futuro</span></div>
+        <div class="d">Custos e documentos serão lidos da rede da empresa.</div>
+        <div class="src">(a definir o caminho UNC)</div></div>
+      <div class="box future" style="--c:var(--muted)"><div class="t">⬆️ Uploads de Excel <span class="pill f">futuro</span></div>
+        <div class="d">Para módulos sem fonte automática.</div>
+        <div class="src">uploads/&lt;modulo&gt;.xlsx</div></div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <b>Fluxo:</b> Login → Capa (rosto) → clique numa peça → Dashboard → <b>app.py</b> lê a fonte (Excel/rede) na hora → mostra KPIs/gráficos.<br>
+    <b>Atualização:</b> a cada abertura/refresh o app relê o arquivo — sempre o dado mais recente (não é tempo real contínuo).<br>
+    <b>Registro de OS:</b> feito no <b>programa TPM</b> (separado); o SGM apenas <b>lê</b> os Excel que o TPM grava.<br>
+    <span class="pill">ativo</span> já funcionando &nbsp; <span class="pill f">futuro</span> a implementar (rede/upload).
+  </div>
+</body>
+</html>

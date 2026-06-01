@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard · Head Count — SGM Caloi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root{--red:#d4232a;--red-d:#a01218;--blue:#1f3a8f;--ink:#1d2430;--muted:#6b7686;
+    --line:#e6e9ef;--bg:#f3f5f9;--card:#fff;--green:#15924c;--amber:#d68a12;--purple:#7a5cc8;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;}
+  a{text-decoration:none;color:inherit;}
+  .topbar{background:#fff;border-bottom:3px solid var(--blue);padding:14px 28px;display:flex;
+    align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,.05);}
+  .topbar h1{font-family:'Oswald',sans-serif;font-weight:700;font-size:20px;letter-spacing:1px;
+    text-transform:uppercase;display:flex;align-items:center;gap:10px;}
+  .topbar h1 .ico{color:var(--blue);font-size:22px;}
+  .top-actions{display:flex;gap:10px;align-items:center;}
+  .btn{border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;
+    display:inline-flex;align-items:center;gap:7px;transition:.2s;}
+  .btn-tpm{background:var(--blue);color:#fff;} .btn-tpm:hover{filter:brightness(.92);}
+  .btn-ghost{background:#eef1f6;color:var(--ink);} .btn-ghost:hover{background:#e2e7f0;}
+  .wrap{max-width:1280px;margin:0 auto;padding:22px 28px 50px;}
+  .filters{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;
+    display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-bottom:20px;}
+  .field{display:flex;flex-direction:column;gap:4px;}
+  .field label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:600;}
+  .field select{border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit;color:var(--ink);background:#fff;min-width:150px;}
+  .field select:focus{outline:none;border-color:var(--blue);}
+  .spacer{flex:1;}
+  .updated{font-size:11px;color:var(--muted);text-align:right;} .updated b{color:var(--green);}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:22px;}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden;}
+  .kpi::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c,var(--blue));}
+  .kpi .v{font-family:'Oswald',sans-serif;font-size:28px;font-weight:700;line-height:1;}
+  .kpi .u{font-size:13px;color:var(--muted);font-weight:600;}
+  .kpi .k{font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-top:6px;font-weight:600;}
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px;margin-bottom:18px;}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;}
+  .panel h3{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:700;
+    margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+  .panel h3 .dot{width:8px;height:8px;border-radius:50%;background:var(--blue);}
+  .c-8{grid-column:span 8;} .c-6{grid-column:span 6;} .c-4{grid-column:span 4;} .c-12{grid-column:span 12;}
+  .chart-box{position:relative;height:280px;} .chart-box.sm{height:240px;} .chart-box.tall{height:340px;}
+  @media(max-width:920px){.c-8,.c-6,.c-4{grid-column:span 12;}}
+  table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:13px;}
+  thead th{background:#f7f9fc;text-align:left;padding:10px 12px;font-size:11px;letter-spacing:.5px;
+    text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line);white-space:nowrap;}
+  tbody td{padding:9px 12px;border-bottom:1px solid #f1f3f7;vertical-align:middle;}
+  tbody tr:hover{background:#fafbfe;}
+  .name{font-weight:600;}
+  .chip{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;margin:2px 3px 2px 0;letter-spacing:.3px;}
+  .c-ok{background:#e8f4ec;color:var(--green);} .c-warn{background:#fdf3e3;color:var(--amber);} .c-bad{background:#fdeaea;color:var(--red);}
+  .fpill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:#eef1f6;color:var(--ink);text-transform:uppercase;letter-spacing:.4px;}
+  .sec-title{font-family:'Oswald',sans-serif;font-size:18px;letter-spacing:.5px;text-transform:uppercase;margin:24px 0 10px;}
+  .muted{color:var(--muted);font-size:12px;}
+  .note{background:#eef4ff;border:1px solid #d6e2ff;color:#33508f;border-radius:10px;padding:10px 14px;font-size:12px;margin-bottom:18px;}
+  .empty{background:#fff;border:1px dashed var(--line);border-radius:12px;padding:50px;text-align:center;color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <h1><span class="ico">👥</span> Dashboard · Head Count</h1>
+  <div class="top-actions">
+    <a class="btn btn-tpm" href="{{ tpm_url or '#' }}" target="_blank" rel="noopener">➕ Abrir TPM</a>
+    <a class="btn btn-ghost" href="/portal">← Voltar à Capa</a>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="filters">
+    <div class="field"><label>Ano</label><select id="fAno"><option value="">Todos</option></select></div>
+    <div class="field"><label>Mês</label><select id="fMes"><option value="">Todos</option></select></div>
+    <div class="field"><label>Função</label><select id="fFuncao"><option value="">Todas</option></select></div>
+    <div class="field"><label>Setor</label><select id="fSetor"><option value="">Todos</option></select></div>
+    <div class="spacer"></div>
+    <div class="updated">Horas/atividades: TPM · Equipe: cadastro<br><span class="muted" id="totalInfo"></span></div>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="grid">
+    <div class="panel c-8"><h3><span class="dot"></span>Horas trabalhadas por colaborador</h3><div class="chart-box tall"><canvas id="chHoras"></canvas></div></div>
+    <div class="panel c-4"><h3><span class="dot"></span>Colaboradores por função</h3><div class="chart-box tall"><canvas id="chFuncao"></canvas></div></div>
+    <div class="panel c-7"><h3><span class="dot"></span>Atividades por setor</h3><div class="chart-box"><canvas id="chSetor"></canvas></div></div>
+    <div class="panel c-5"><h3><span class="dot"></span>Horas trabalhadas por mês</h3><div class="chart-box"><canvas id="chMes"></canvas></div></div>
+  </div>
+
+  <div class="sec-title">📅 Cronograma de Férias</div>
+  <div class="panel c-12"><div class="chart-box tall"><canvas id="chFerias"></canvas></div>
+    <p class="muted" id="feriasInfo" style="margin-top:8px;"></p></div>
+
+  <div class="sec-title">🎓 Capacitação dos colaboradores</div>
+  <div class="note">Status: <span class="chip c-ok">válido</span> em dia · <span class="chip c-warn">vencendo</span> ≤ 60 dias · <span class="chip c-bad">vencido</span> expirado.</div>
+  <div style="overflow-x:auto;"><table id="tblCap"><thead><tr><th>Colaborador</th><th>Função</th><th>Setor</th><th>Horas</th><th>Capacitações</th></tr></thead><tbody id="capBody"></tbody></table></div>
+  <p class="muted" style="margin-top:8px;">Edite o efetivo, férias e capacitações em <code>config/colaboradores.json</code>.</p>
+
+  <div class="empty" id="empty" style="display:none;">
+    <div style="font-size:40px;margin-bottom:10px;">👥</div>
+    <strong>Sem dados de equipe.</strong><br>Cadastre os colaboradores em <code>config/colaboradores.json</code>.
+  </div>
+</div>
+
+<script>
+const RECORDS = {{ records_json | tojson }};
+const COLAB = {{ colaboradores | tojson }};
+const KEYS = RECORDS.length ? Object.keys(RECORDS[0]) : [];
+function findKey(...c){for(const x of c){const k=KEYS.find(k=>k.toLowerCase().includes(x));if(k)return k;}return null;}
+const F={data:findKey('ocorr','data/hora','data'),tec:findKey('técnic','tecnic','respons'),
+  setor:findKey('setor','área','area'),horas:findKey('total horas','horas parad','horas','tempo')};
+function parseData(v){if(!v)return null;const s=String(v);
+  let m=s.match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);
+  m=s.match(/(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})/);if(m)return new Date(+m[3],+m[2]-1,+m[1]);
+  const d=new Date(s);return isNaN(d)?null:d;}
+function num(v){const n=parseFloat(String(v).replace(',','.'));return isNaN(n)?0:n;}
+function val(r,k){return k&&r[k]!=null?r[k]:'';}
+function norm(s){return String(s||'').trim().toLowerCase();}
+function lower(x){return String(x||'').toLowerCase();}
+RECORDS.forEach(r=>{r._d=parseData(val(r,F.data));r._h=num(val(r,F.horas));r._t=String(val(r,F.tec)).trim();r._s=String(val(r,F.setor)).trim();});
+
+const FUNCOES = ['Mecânico','Eletricista','Ferramenteiro','Serralheiro','Auxiliar de Manutenção'];
+// COLAB vem da planilha Colaboradores.xlsx (lista de linhas com colunas)
+const CK = (COLAB.length)?Object.keys(COLAB[0]):[];
+function ck(...c){for(const x of c){const k=CK.find(k=>k.toLowerCase().includes(x));if(k)return k;}return null;}
+const CKnome=ck('nome'), CKfunc=ck('função','funcao','cargo'), CKsetor=ck('setor','área','area'), CKadm=ck('admiss');
+const CKferI=CK.filter(k=>/in[ií]cio/i.test(k)), CKferF=CK.filter(k=>/fim/i.test(k));
+const CKcap=CK.filter(k=>/capacita/i.test(k)), CKval=CK.filter(k=>/validade/i.test(k));
+function cval(row,k){return k&&row[k]!=null?String(row[k]).trim():'';}
+const COLS = COLAB.filter(row=>cval(row,CKnome)).map(row=>{
+  const ferias=CKferI.map((k,i)=>({inicio:cval(row,k),fim:cval(row,CKferF[i])})).filter(f=>f.inicio&&f.fim);
+  const capacitacoes=CKcap.map((k,i)=>({nome:cval(row,k),validade:CKval[i]?cval(row,CKval[i]):''})).filter(c=>c.nome);
+  return {nome:cval(row,CKnome),funcao:cval(row,CKfunc)||'—',setor:cval(row,CKsetor)||'—',
+          admissao:cval(row,CKadm),ferias,capacitacoes};
+});
+
+// filtros base
+const MES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const anos=[...new Set(RECORDS.map(r=>r._d?r._d.getFullYear():null).filter(Boolean))].sort((a,b)=>b-a);
+const setores=[...new Set([...RECORDS.map(r=>r._s),...COLS.map(c=>String(c.setor||'').trim())].filter(Boolean))].sort();
+anos.forEach(a=>fAno.add(new Option(a,a)));
+MES.forEach((m,i)=>fMes.add(new Option(m,i+1)));
+FUNCOES.forEach(f=>fFuncao.add(new Option(f,f)));
+setores.forEach(s=>fSetor.add(new Option(s,s)));
+
+function osFiltradas(){const a=fAno.value,mes=fMes.value,se=lower(fSetor.value);
+  return RECORDS.filter(r=>{
+    if(a&&(!r._d||r._d.getFullYear()!=a))return false;
+    if(mes&&(!r._d||(r._d.getMonth()+1)!=mes))return false;
+    if(se&&lower(r._s)!==se)return false;return true;});}
+
+// pessoas = cadastro + técnicos do TPM não cadastrados
+function montarPessoas(os){
+  const horasTec={},osTec={};
+  os.forEach(r=>{const t=norm(r._t);if(!t)return;horasTec[t]=(horasTec[t]||0)+r._h;osTec[t]=(osTec[t]||0)+1;});
+  const map={};
+  COLS.forEach(c=>{const key=norm(c.nome);map[key]={nome:c.nome,funcao:c.funcao||'—',setor:c.setor||'—',
+    admissao:c.admissao||'',ferias:c.ferias||[],capac:c.capacitacoes||[],horas:horasTec[key]||0,os:osTec[key]||0,cad:true};});
+  Object.keys(horasTec).forEach(t=>{if(!map[t]){const orig=os.find(r=>norm(r._t)===t);
+    map[t]={nome:orig?orig._t:t,funcao:'Não cadastrado',setor:orig?orig._s:'—',admissao:'',ferias:[],capac:[],horas:horasTec[t],os:osTec[t],cad:false};}});
+  let arr=Object.values(map);
+  const ff=fFuncao.value, se=lower(fSetor.value);
+  if(ff)arr=arr.filter(p=>p.funcao===ff);
+  if(se)arr=arr.filter(p=>lower(p.setor)===se);
+  return arr.sort((a,b)=>b.horas-a.horas);
+}
+
+// capacitação status
+function capStatus(validade){
+  if(!validade)return 'ok';
+  const v=parseData(validade); if(!v)return 'ok';
+  const hoje=new Date(); const dias=(v-hoje)/86400000;
+  if(dias<0)return 'bad'; if(dias<=60)return 'warn'; return 'ok';
+}
+function emFerias(p,ref){return (p.ferias||[]).some(f=>{const i=parseData(f.inicio),fim=parseData(f.fim);return i&&fim&&ref>=i&&ref<=fim;});}
+
+let charts={};
+const C={red:'#d4232a',blue:'#1f3a8f',green:'#15924c',amber:'#d68a12',gray:'#9aa4b2',purple:'#7a5cc8'};
+const PAL=[C.blue,C.red,C.green,C.amber,C.purple,'#2a9a8a','#b5654a',C.gray];
+function mk(id,cfg){if(charts[id])charts[id].destroy();charts[id]=new Chart(document.getElementById(id),cfg);}
+function baseOpt(axis){return{responsive:true,maintainAspectRatio:false,indexAxis:axis||'x',
+  plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:'#eef1f6'}}}};}
+
+function renderKpis(pessoas,os){
+  const horas=pessoas.reduce((a,p)=>a+p.horas,0);
+  const hoje=new Date();
+  const ferias=pessoas.filter(p=>emFerias(p,hoje)).length;
+  let venc=0,vencendo=0;
+  pessoas.forEach(p=>p.capac.forEach(c=>{const s=capStatus(c.validade);if(s==='bad')venc++;else if(s==='warn')vencendo++;}));
+  const cards=[
+    {v:pessoas.length,k:'Colaboradores',c:'var(--blue)'},
+    {v:horas.toFixed(1),u:'h',k:'Horas trabalhadas',c:'var(--red)'},
+    {v:os.length,k:'Atividades (OS)',c:'var(--purple)'},
+    {v:ferias,k:'Em férias hoje',c:'var(--green)'},
+    {v:vencendo,k:'Capac. vencendo',c:'var(--amber)'},
+    {v:venc,k:'Capac. vencidas',c:'var(--red)'},
+  ];
+  kpis.innerHTML=cards.map(c=>`<div class="kpi" style="--c:${c.c}"><div class="v">${c.v}${c.u?` <span class="u">${c.u}</span>`:''}</div><div class="k">${c.k}</div></div>`).join('');
+}
+function renderCharts(pessoas,os){
+  // horas por colaborador
+  const ph=pessoas.filter(p=>p.horas>0);
+  mk('chHoras',{type:'bar',data:{labels:ph.map(p=>p.nome),datasets:[{data:ph.map(p=>+p.horas.toFixed(1)),backgroundColor:C.blue,borderRadius:5}]},options:baseOpt('y')});
+  // por função
+  const fmap={};pessoas.forEach(p=>{fmap[p.funcao]=(fmap[p.funcao]||0)+1;});
+  const fk=Object.keys(fmap);
+  mk('chFuncao',{type:'doughnut',data:{labels:fk,datasets:[{data:fk.map(k=>fmap[k]),backgroundColor:fk.map((_,i)=>PAL[i%PAL.length])}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'bottom',labels:{boxWidth:11,font:{size:10}}}}}});
+  // atividades por setor (OS por setor)
+  const smap={};os.forEach(r=>{const s=r._s||'(sem setor)';smap[s]=(smap[s]||0)+1;});
+  const sk=Object.entries(smap).sort((a,b)=>b[1]-a[1]);
+  mk('chSetor',{type:'bar',data:{labels:sk.map(e=>e[0]),datasets:[{data:sk.map(e=>e[1]),backgroundColor:C.amber,borderRadius:5}]},options:baseOpt('y')});
+  // horas por mês
+  const byMes={};os.forEach(r=>{if(r._d){const k=`${r._d.getFullYear()}-${String(r._d.getMonth()+1).padStart(2,'0')}`;byMes[k]=(byMes[k]||0)+r._h;}});
+  const mk_=Object.keys(byMes).sort();
+  mk('chMes',{type:'line',data:{labels:mk_,datasets:[{data:mk_.map(k=>+byMes[k].toFixed(1)),borderColor:C.blue,backgroundColor:'rgba(31,58,143,.12)',fill:true,tension:.3,pointRadius:3}]},options:baseOpt()});
+}
+function renderFerias(pessoas){
+  // barras flutuantes por período de férias (mês 1..13)
+  const labels=[], data=[], cores=[];
+  pessoas.forEach((p,idx)=>{(p.ferias||[]).forEach(f=>{
+    const i=parseData(f.inicio),fim=parseData(f.fim); if(!i||!fim)return;
+    const fm=v=>v.getMonth()+1+(v.getDate()-1)/30;
+    labels.push(p.nome); data.push([fm(i),fm(fim)]); cores.push(PAL[idx%PAL.length]);
+  });});
+  if(!labels.length){mk('chFerias',{type:'bar',data:{labels:['(sem férias cadastradas)'],datasets:[{data:[[0,0]]}]},options:baseOpt('y')});
+    feriasInfo.textContent='Nenhum período de férias cadastrado para o filtro atual.';return;}
+  feriasInfo.textContent=`${labels.length} período(s) de férias.`;
+  mk('chFerias',{type:'bar',data:{labels,datasets:[{data,backgroundColor:cores,borderRadius:4,barThickness:16}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>{const v=ctx.raw;const nm=m=>MES[Math.max(0,Math.min(11,Math.floor(m)-1))];return `${nm(v[0])} → ${nm(v[1])}`;}}}},
+      scales:{x:{min:1,max:13,ticks:{stepSize:1,callback:v=>MES[v-1]||''},grid:{color:'#eef1f6'}},y:{grid:{display:false}}}}});
+}
+function renderCap(pessoas){
+  capBody.innerHTML=pessoas.map(p=>{
+    const caps=(p.capac||[]).map(c=>{const s=capStatus(c.validade);const cls=s==='bad'?'c-bad':s==='warn'?'c-warn':'c-ok';
+      const vd=c.validade?` (val. ${parseData(c.validade)?parseData(c.validade).toLocaleDateString('pt-BR'):c.validade})`:'';
+      return `<span class="chip ${cls}">${c.nome}${vd}</span>`;}).join('')||'<span class="muted">—</span>';
+    return `<tr><td class="name">${p.nome}</td><td><span class="fpill">${p.funcao}</span></td><td>${p.setor}</td><td>${p.horas.toFixed(1)} h</td><td>${caps}</td></tr>`;
+  }).join('');
+}
+function update(){
+  const os=osFiltradas(); const pessoas=montarPessoas(os);
+  totalInfo.textContent=`${pessoas.length} colaboradores · ${os.length} OS no filtro`;
+  renderKpis(pessoas,os);renderCharts(pessoas,os);renderFerias(pessoas);renderCap(pessoas);
+}
+[fAno,fMes,fFuncao,fSetor].forEach(e=>e.addEventListener('change',update));
+
+if(!COLS.length && !RECORDS.length){
+  document.querySelectorAll('.grid,.kpis,.sec-title,.note,#tblCap,#feriasInfo').forEach(el=>el.style.display='none');
+  empty.style.display='block';
+}else{update();}
+</script>
+</body>
+</html>

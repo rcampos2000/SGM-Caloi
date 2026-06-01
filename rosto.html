@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SGM · Caloi Norte SA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --steel: #1a1a1a;
+    --chrome: #2a2a2a;
+    --red: #d4232a;          /* vermelho Caloi */
+    --red-glow: rgba(212,35,42,0.5);
+    --blue: #1f3a8f;         /* azul royal Caloi */
+    --blue-glow: rgba(31,58,143,0.5);
+    --gold: #c8a84b;
+    --silver: #8a9ba8;
+    --text: #d0d8e0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background:
+      linear-gradient(rgba(10,6,10,0.45), rgba(10,6,10,0.72)),
+      url('fotos/Nova imagem.png') center center / cover no-repeat;
+    background-attachment: fixed;
+    color: var(--text);
+    font-family: 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 0;
+    overflow-x: hidden;
+  }
+  /* Textura metálica no fundo */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(255,255,255,0.015) 2px,
+        rgba(255,255,255,0.015) 4px
+      );
+    pointer-events: none;
+    z-index: 0;
+  }
+  /* ── MARCA D'ÁGUA CENTRAL ── */
+  .watermark {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) rotate(-4deg);
+    z-index: 0;
+    pointer-events: none;
+    text-align: center;
+    user-select: none;
+  }
+  .watermark .wm-text {
+    font-size: 260px;
+    font-weight: 900;
+    font-style: italic;
+    letter-spacing: -8px;
+    color: #fff;
+    opacity: 0.07;
+    line-height: 0.8;
+    text-transform: lowercase;
+    font-family: 'Arial Black', 'Segoe UI', sans-serif;
+  }
+  .watermark .wm-sub {
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: 28px;
+    color: #fff;
+    opacity: 0.08;
+    text-transform: uppercase;
+    margin-top: -10px;
+    padding-left: 28px;
+  }
+  /* ── LOGOS LATERAIS (centralizados na altura da roda) ── */
+  .logo-side {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    background: #fff;
+    border: 3px solid var(--blue);
+    border-radius: 16px;
+    padding: 12px;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.55), inset 0 0 0 2px var(--red);
+    animation: fadeDown 0.9s ease both;
+  }
+  .logo-side img { width: 100%; height: auto; display: block; border-radius: 6px; }
+  .logo-side.left  { left: 30px;  width: 220px; }
+  .logo-side.right { right: 30px; width: 210px; }
+  @media (max-width: 1320px) { .logo-side { display: none; } }
+  /* ── LOGOS CALOI ── */
+  .logo-row {
+    display: flex; align-items: center; justify-content: center;
+    gap: 16px; flex-wrap: wrap; margin-bottom: 16px;
+  }
+  /* placa branca com o wordmark CALOi */
+  .logo-plate {
+    background: #fff;
+    border: 3px solid var(--blue);
+    border-radius: 44px;
+    padding: 8px 30px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.45), inset 0 0 0 2px var(--red);
+    display: inline-flex; align-items: center;
+  }
+  .caloi-word {
+    font-family: 'Arial Black', 'Segoe UI', sans-serif;
+    font-style: italic; font-weight: 900;
+    font-size: 40px; letter-spacing: 1px;
+    color: var(--red);
+    -webkit-text-stroke: 1.6px var(--blue);
+    text-stroke: 1.6px var(--blue);
+    line-height: 1;
+  }
+  /* selo Super Luxo */
+  .badge-luxo {
+    background: #fff; color: var(--blue);
+    border: 2px solid var(--red);
+    border-radius: 99px;
+    padding: 7px 16px;
+    font-size: 11px; font-weight: 800;
+    letter-spacing: 2px; text-transform: uppercase;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+  }
+  /* faixa Indústria Brasileira */
+  .badge-br {
+    display: inline-flex; flex-direction: column; align-items: center;
+    background: #0a7d3a; color: #fff;
+    border: 2px solid #fff;
+    border-radius: 6px;
+    padding: 5px 14px; line-height: 1.3;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+  }
+  .badge-br b { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; }
+  .badge-br span { font-size: 8px; letter-spacing: 1px; color: var(--gold); text-transform: uppercase; }
+  /* ── HEADER (título industrial + logos ao lado) ── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    margin: 4px 0 6px;
+    padding: 0 24px;
+    animation: fadeDown 0.8s ease;
+    z-index: 1;
+  }
+  .title-main {
+    font-family: 'Anton', 'Oswald', 'Impact', 'Arial Black', sans-serif;
+    font-weight: 400;
+    font-size: 46px;
+    letter-spacing: 3px;
+    line-height: 1.02;
+    text-transform: uppercase;
+    color: #fff;
+    text-align: center;
+    max-width: 520px;
+    text-shadow: 0 3px 0 rgba(0,0,0,0.45), 0 0 22px rgba(0,0,0,0.7);
+  }
+  .title-main b { color: var(--red); font-weight: 400; }
+  .round-logo {
+    background: #fff;
+    border: 3px solid var(--blue);
+    border-radius: 14px;
+    padding: 8px 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.45);
+  }
+  .round-logo img { height: 52px; display: block; }
+  .brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .brand-bar {
+    width: 40px; height: 3px;
+    background: linear-gradient(90deg, var(--red) 0 50%, var(--blue) 50% 100%);
+  }
+  .brand-name {
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: #fff;
+  }
+  .header h1 {
+    font-size: 22px;
+    font-weight: 300;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--silver);
+  }
+  .header h1 span { color: var(--red); font-weight: 700; }
+  .header .sub {
+    font-size: 9px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+    margin-top: 6px;
+  }
+  /* ── CENA PRINCIPAL ── */
+  body { perspective: 1700px; perspective-origin: 50% 38%; }
+  .scene {
+    position: relative;
+    width: 820px;
+    height: 820px;
+    z-index: 1;
+    transform-style: preserve-3d;
+    transform: rotateX(16deg);
+    transition: transform 0.6s ease;
+    margin-top: -48px;
+  }
+  /* sombra de chão (dá assentamento 3D) */
+  .scene::after {
+    content: '';
+    position: absolute;
+    left: 50%; bottom: 70px;
+    width: 540px; height: 80px;
+    transform: translateX(-50%) translateZ(-40px);
+    background: radial-gradient(ellipse, rgba(0,0,0,0.6) 0%, transparent 72%);
+    filter: blur(10px);
+    z-index: -1;
+  }
+  /* SVG da roda de bicicleta — fixa e centralizada na cena */
+  .wheel-svg {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 560px; height: 560px;
+    transform: translate(-50%, -50%);
+  }
+  /* ── CUBO (centro) ── */
+  .hub {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 96px; height: 96px;
+    background: radial-gradient(circle at 35% 30%, #3a3a3a, #0d0d0d);
+    border: 3px solid #444;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow:
+      0 0 0 6px #1a1a1a,
+      0 0 0 8px #333,
+      0 0 20px rgba(0,0,0,0.8),
+      inset 0 2px 4px rgba(255,255,255,0.1);
+  }
+  .hub:hover {
+    border-color: var(--red);
+    box-shadow:
+      0 0 0 6px #1a1a1a,
+      0 0 0 8px #444,
+      0 0 30px var(--red-glow),
+      inset 0 2px 4px rgba(255,255,255,0.15);
+  }
+  .hub-logo { font-size: 12px; font-weight: 900; letter-spacing: 3px; color: #fff; }
+  .hub-sub  { font-size: 8px; letter-spacing: 2px; color: #555; margin-top: 2px; text-transform: uppercase; }
+  .hub-bolt {
+    position: absolute;
+    width: 16px; height: 16px;
+    background: radial-gradient(circle at 40% 35%, #666, #222);
+    border-radius: 50%;
+    border: 1px solid #555;
+  }
+  .hub-bolt::after {
+    content: '+';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    font-size: 10px;
+    color: #444;
+    font-weight: 900;
+  }
+  /* ── CARTÕES (formato de elo de corrente) ── */
+  .card {
+    position: absolute;
+    width: 118px; height: 118px;
+    cursor: pointer;
+    z-index: 15;
+    text-decoration: none;
+    color: var(--text);
+    animation: popIn 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+    filter: drop-shadow(0 6px 7px rgba(0,0,0,0.7));
+    transition: filter .3s, transform .3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .card:hover {
+    transform: scale(1.4) translateZ(80px) translateY(-6px); z-index: 30;
+    filter: drop-shadow(0 0 18px var(--accent-glow, rgba(204,31,31,.6)))
+            drop-shadow(0 16px 18px rgba(0,0,0,.8))
+            brightness(1.15);
+  }
+  /* a peça mecânica desenhada em SVG */
+  .part { position: absolute; inset: 0; transform-origin: 50% 50%; }
+  .part svg { width: 100%; height: 100%; display: block; }
+  /* ao passar o mouse, a peça gira continuamente */
+  .card:hover .part { animation: spinPart 2s linear infinite; }
+  @keyframes spinPart {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+  /* faixa colorida do módulo (anel sutil sobre a peça) */
+  .part .accent-ring { stroke: var(--accent); }
+  /* conteúdo sobreposto à peça */
+  .card-content {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 2px; z-index: 4; pointer-events: none;
+    padding: 0 14px;
+  }
+  .card-inner {
+    /* acabamento de aço escovado */
+    background:
+      linear-gradient(145deg, #3a4149 0%, #232a31 42%, #13171c 100%);
+    border: 1px solid #444c55;
+    border-radius: 14px;
+    padding: 12px 6px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    position: relative;
+    transition: border-color 0.3s, background 0.3s;
+  }
+  /* brilho metálico diagonal */
+  .gloss {
+    position: absolute; inset: 0;
+    background: linear-gradient(160deg, rgba(255,255,255,0.12) 0%, transparent 42%);
+    pointer-events: none; z-index: 2;
+  }
+  /* entalhes laterais do elo de corrente */
+  .card-inner.link::before,
+  .card-inner.link::after {
+    content: '';
+    position: absolute;
+    width: 14px; height: 14px;
+    background: var(--bg);
+    border-radius: 50%;
+    top: 50%; transform: translateY(-50%);
+    border: 1px solid #222; z-index: 3;
+  }
+  .card-inner.link::before { left: -7px; }
+  .card-inner.link::after  { right: -7px; }
+  .card-inner.link { border-radius: 26px; width: 108px; }
+  /* peças recortadas: formato quadrado p/ a geometria não distorcer */
+  .card-inner.shaped {
+    width: 110px; height: 110px;
+    padding: 6px;
+    border-radius: 0;
+  }
+  /* furo central da porca / engrenagem */
+  .bore {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 30px; height: 30px;
+    transform: translate(-50%,-50%);
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, #0c0f12, #000);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.9), 0 1px 0 rgba(255,255,255,0.08);
+    z-index: 1;
+  }
+  .bolt {
+    position: absolute;
+    width: 9px; height: 9px;
+    background: radial-gradient(circle at 35% 30%, #555, #1a1a1a);
+    border-radius: 50%;
+    border: 1px solid #444;
+  }
+  .bolt::after {
+    content: '×';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    font-size: 6px;
+    color: #333;
+  }
+  .bolt-tl { top: 5px;  left: 5px; }
+  .bolt-tr { top: 5px;  right: 5px; }
+  .bolt-bl { bottom: 5px; left: 5px; }
+  .bolt-br { bottom: 5px; right: 5px; }
+  .card:hover .card-inner {
+    border-color: var(--accent, #cc1f1f);
+    box-shadow:
+      0 8px 24px rgba(0,0,0,0.8),
+      0 0 20px var(--accent-glow, rgba(204,31,31,0.3)),
+      inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+  .card-ico  { font-size: 22px; position: relative; z-index: 4;
+               filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8)); }
+  .card-lbl  {
+    font-size: 9px; font-weight: 700;
+    text-align: center; line-height: 1.25;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: #fff;
+    position: relative; z-index: 4;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.9);
+  }
+  .card-sub  {
+    font-size: 7.5px; text-align: center;
+    color: #8a96a2; line-height: 1.2;
+    letter-spacing: 0.4px;
+    position: relative; z-index: 4;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.9);
+  }
+  .card-stripe {
+    position: absolute;
+    top: 0; left: 12px; right: 12px;
+    height: 3px;
+    border-radius: 0 0 2px 2px;
+  }
+  /* tag "em breve" */
+  .soon {
+    position: absolute;
+    top: -8px; right: -4px;
+    font-size: 6.5px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    padding: 2px 5px; border-radius: 99px;
+    background: #1a1a1a; color: #888;
+    border: 1px solid #333;
+    z-index: 5;
+  }
+  /* ── TOOLTIP ── */
+  .tip {
+    position: fixed;
+    background: #111;
+    border: 1px solid #333;
+    border-left: 3px solid var(--red);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 11px;
+    color: #aaa;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 100;
+    max-width: 220px;
+    line-height: 1.7;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+  }
+  .tip.show { opacity: 1; }
+  .tip strong { display: block; color: #fff; font-size: 12px; margin-bottom: 3px; }
+  .tip em { color: #555; font-style: normal; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; }
+  /* ── STATS ── */
+  .stats {
+    display: flex;
+    gap: 0;
+    margin-top: 24px;
+    border: 1px solid #222;
+    border-radius: 10px;
+    overflow: hidden;
+    animation: fadeUp 1s ease 0.5s both;
+    z-index: 1;
+  }
+  .stat {
+    padding: 10px 22px;
+    text-align: center;
+    border-right: 1px solid #222;
+    background: linear-gradient(145deg, #141414, #0d0d0d);
+  }
+  .stat:last-child { border-right: none; }
+  .stat .val {
+    font-size: 18px; font-weight: 900;
+    color: var(--red);
+    font-variant-numeric: tabular-nums;
+  }
+  .stat .key {
+    font-size: 8px; letter-spacing: 2px;
+    text-transform: uppercase; color: #444;
+    margin-top: 2px;
+  }
+  /* ── ANIMAÇÕES ── */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes popIn {
+    0%   { opacity: 0; transform: scale(0.3); }
+    70%  { transform: scale(1.06); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    animation: fadeUp 1s ease 0.7s both;
+    z-index: 1;
+  }
+  .status-dot {
+    width: 6px; height: 6px;
+    background: #0f6e56;
+    border-radius: 50%;
+    box-shadow: 0 0 6px #0f6e56;
+    animation: blink 2s ease infinite;
+  }
+  @keyframes blink {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.3; }
+  }
+  /* ── MODAL "em breve" ── */
+  .overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+    align-items: center; justify-content: center;
+  }
+  .overlay.show { display: flex; }
+  .modal {
+    background: var(--steel);
+    border: 1px solid #333;
+    border-top: 3px solid var(--red);
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 420px; width: 90%;
+    text-align: center;
+    animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .modal .mico { font-size: 36px; margin-bottom: 12px; }
+  .modal h2 { font-size: 18px; color: #fff; margin-bottom: 8px; }
+  .modal p  { font-size: 12px; color: #777; line-height: 1.7; margin-bottom: 20px; }
+  .modal-close {
+    background: var(--red); color: #fff;
+    border: none; border-radius: 8px;
+    padding: 10px 24px; font-size: 12px;
+    font-weight: 700; cursor: pointer;
+    letter-spacing: 1px;
+  }
+  .modal-close:hover { background: #a01218; }
+  @media (max-width: 860px) {
+    .scene { transform: scale(calc(100vw / 880)); transform-origin: top center; margin-bottom: -180px; }
+  }
+</style>
+</head>
+<body>
+<div class="watermark">
+  <div class="wm-text">caloi</div>
+  <div class="wm-sub">Manutenção</div>
+</div>
+
+<div class="header">
+  <div class="logo-plate"><span class="caloi-word">CALOi</span></div>
+  <h1 class="title-main">Sistema de Gestão de Manutenção</h1>
+  <div class="round-logo"><img src="fotos/download.png" alt="Caloi · Pedal para todos"></div>
+</div>
+
+<div class="scene" id="scene">
+  <svg class="wheel-svg" viewBox="0 0 720 720" id="wheelSvg">
+    <defs>
+      <!-- Borracha do pneu (perfil arredondado) -->
+      <radialGradient id="tireGrad" cx="38%" cy="32%" r="75%">
+        <stop offset="0%"  stop-color="#3a3a3a"/>
+        <stop offset="45%" stop-color="#1c1c1c"/>
+        <stop offset="100%" stop-color="#080808"/>
+      </radialGradient>
+      <!-- Aro de alumínio: brilho metálico que varia ao redor -->
+      <linearGradient id="rimGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%"   stop-color="#9aa6b2"/>
+        <stop offset="22%"  stop-color="#4a525c"/>
+        <stop offset="50%"  stop-color="#c4cdd6"/>
+        <stop offset="78%"  stop-color="#3a4048"/>
+        <stop offset="100%" stop-color="#8a96a2"/>
+      </linearGradient>
+      <radialGradient id="hubGrad" cx="38%" cy="32%" r="70%">
+        <stop offset="0%"  stop-color="#6a6a6a"/>
+        <stop offset="55%" stop-color="#2a2a2a"/>
+        <stop offset="100%" stop-color="#0d0d0d"/>
+      </radialGradient>
+      <radialGradient id="flangeGrad" cx="40%" cy="35%" r="70%">
+        <stop offset="0%"  stop-color="#888"/>
+        <stop offset="60%" stop-color="#383838"/>
+        <stop offset="100%" stop-color="#161616"/>
+      </radialGradient>
+      <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000" flood-opacity="0.7"/>
+      </filter>
+      <!-- luz direcional 3D (topo iluminado, base sombreada) -->
+      <linearGradient id="tireLight" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0"    stop-color="#ffffff" stop-opacity="0.26"/>
+        <stop offset="0.42" stop-color="#ffffff" stop-opacity="0"/>
+        <stop offset="0.6"  stop-color="#000000" stop-opacity="0"/>
+        <stop offset="1"    stop-color="#000000" stop-opacity="0.6"/>
+      </linearGradient>
+      <linearGradient id="rimLight" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0"    stop-color="#ffffff" stop-opacity="0.35"/>
+        <stop offset="0.5"  stop-color="#ffffff" stop-opacity="0"/>
+        <stop offset="1"    stop-color="#000000" stop-opacity="0.5"/>
+      </linearGradient>
+    </defs>
+
+    <!-- ── PNEU (seção arredondada 3D) ── -->
+    <circle cx="360" cy="360" r="344" fill="none" stroke="#000" stroke-width="44" filter="url(#softShadow)"/>
+    <g id="tire"></g>                                  <!-- tubo de borracha (via JS) -->
+    <circle id="tread" cx="360" cy="360" r="344" fill="none" stroke="#000" stroke-width="34"
+            stroke-dasharray="3 9" opacity="0.5"/>
+    <circle cx="360" cy="360" r="344" fill="none" stroke="url(#tireLight)" stroke-width="40"/>
+    <circle cx="360" cy="360" r="362" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="1.5"/>
+    <circle cx="360" cy="360" r="326" fill="none" stroke="rgba(0,0,0,0.7)" stroke-width="2"/>
+
+    <!-- ── ARO (rim) com profundidade ── -->
+    <circle cx="360" cy="360" r="306" fill="none" stroke="#0c0f12" stroke-width="9"/>     <!-- parede interna sombreada -->
+    <circle cx="360" cy="360" r="318" fill="none" stroke="url(#rimGrad)" stroke-width="15"/>
+    <circle cx="360" cy="360" r="318" fill="none" stroke="url(#rimLight)" stroke-width="15"/>
+    <circle cx="360" cy="360" r="325.5" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="1.5"/>
+    <circle cx="360" cy="360" r="310.5" fill="none" stroke="rgba(0,0,0,0.6)" stroke-width="1.5"/>
+    <!-- filetes clássicos Caloi (vermelho + azul) -->
+    <circle cx="360" cy="360" r="322" fill="none" stroke="var(--red)"  stroke-width="2.5" opacity="0.92"/>
+    <circle cx="360" cy="360" r="314" fill="none" stroke="var(--blue)" stroke-width="2.5" opacity="0.92"/>
+
+    <!-- ── RAIOS (gerados via JS) ── -->
+    <g id="spokes"></g>
+    <!-- niples no aro (gerados via JS) -->
+    <g id="nipples"></g>
+
+    <!-- ── VÁLVULA ── -->
+    <rect x="356" y="28" width="8" height="26" rx="2" fill="#2a2a2a" stroke="#444" stroke-width="0.5"/>
+    <rect x="353" y="24" width="14" height="7" rx="2" fill="var(--red)"/>
+
+    <!-- ── CUBO (hub) ── -->
+    <circle cx="360" cy="360" r="62" fill="url(#flangeGrad)" filter="url(#softShadow)"/>
+    <circle cx="360" cy="360" r="62" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+    <circle cx="360" cy="360" r="40" fill="url(#hubGrad)" stroke="#111" stroke-width="2"/>
+    <circle cx="360" cy="360" r="40" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>
+    <!-- furos da flange para os raios (decorativo) -->
+    <g id="flangeHoles"></g>
+  </svg>
+
+  <div class="hub" id="hub" onclick="window.location='/modulo/ordens'" title="Dashboard de OS">
+    <div class="hub-logo">SGM</div>
+    <div class="hub-sub">Caloi</div>
+    <div class="hub-bolt" style="top:6px;left:6px"></div>
+    <div class="hub-bolt" style="top:6px;right:6px"></div>
+    <div class="hub-bolt" style="bottom:6px;left:6px"></div>
+    <div class="hub-bolt" style="bottom:6px;right:6px"></div>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="val">13</div><div class="key">Módulos</div></div>
+  <div class="stat"><div class="val">6</div><div class="key">Ativos</div></div>
+  <div class="stat"><div class="val">24/7</div><div class="key">Online</div></div>
+  <div class="stat"><div class="val">TPM</div><div class="key">Framework</div></div>
+  <div class="stat"><div class="val">Auto</div><div class="key">KPIs</div></div>
+</div>
+
+<div class="status-bar">
+  <div class="status-dot"></div>
+  Sistema operacional · Railway Cloud · Manaus AM
+</div>
+
+<div class="tip" id="tip"></div>
+
+<div class="overlay" id="overlay" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="mico" id="modalIco">🔧</div>
+    <h2 id="modalTitle">Módulo</h2>
+    <p id="modalDesc">Em desenvolvimento</p>
+    <button class="modal-close" onclick="closeModal()">Fechar</button>
+  </div>
+</div>
+
+<script>
+// ── Módulos (do HTML original, no formato da roda) ──
+const MODULES = [
+  { icon:'🔧', lbl:'OS<br>Manutenção',      sub:'CM · PM · PdM',  color:'#cc1f1f', glow:'rgba(204,31,31,.35)',  href:'https://web-production-97918.up.railway.app', ext:true,
+    tip:'<strong>OS · Manutenção</strong><em>Corretiva · Preventiva · Preditiva</em>Registro de ordens de serviço com fotos, assinatura e histórico por TAG.' },
+  { icon:'✅', lbl:'Plano de<br>Ação',       sub:'5W2H · GUT',     color:'#0f6e56', glow:'rgba(15,110,86,.35)',  href:'/modulo/plano-acao',
+    tip:'<strong>Plano de Ação</strong><em>5W2H · GUT · Criticidade</em>Gestão de ações corretivas e melhorias com prioridade e prazo.' },
+  { icon:'📊', lbl:'KPIs<br>Indicadores',    sub:'MTBF · OEE',     color:'#c8a84b', glow:'rgba(200,168,75,.35)', href:'/modulo/kpi',
+    tip:'<strong>KPIs · Indicadores</strong><em>MTBF · MTTR · OEE · Disponibilidade</em>Dashboard de indicadores com drill-down.' },
+  { icon:'📅', lbl:'Planejamento<br>PM',     sub:'Agenda · SLA',   color:'#0f6e56', glow:'rgba(15,110,86,.35)',  href:'/agenda',
+    tip:'<strong>Planejamento de Manutenção</strong><em>Preventivas · Plano Mestre · SLA</em>Agenda de PM, alocação de técnicos e alertas de vencimento.' },
+  { icon:'🔍', lbl:'Histórico<br>TAG',       sub:'QR · Equip.',    color:'#4a7ab5', glow:'rgba(74,122,181,.35)', href:'/modulo/historico',
+    tip:'<strong>Histórico de Equipamentos</strong><em>QR Code · TAG</em>Consulta completa por TAG com leitura de QR Code no campo.' },
+  { icon:'⚙️', lbl:'Configurações<br>Sistema', sub:'Admin · Meta', color:'#777',  glow:'rgba(128,128,128,.35)', href:'/admin',
+    tip:'<strong>Configurações do Sistema</strong><em>Usuários · Equipamentos · Metas</em>Gestão de usuários, cadastros, metas de KPI e backups.' },
+  { icon:'💰', lbl:'Custos<br>Manutenção',   sub:'Orçamento',      color:'#c8a84b', glow:'rgba(200,168,75,.35)', href:'/custos',
+    tip:'<strong>Custos de Manutenção</strong><em>Orçamento · Custo/OS</em>Controle de custos por OS, centro de custo e período.' },
+  { icon:'🔩', lbl:'Peças de<br>Reposição',  sub:'Estoque · TAG',  color:'#7a5cc8', glow:'rgba(122,92,200,.35)', href:'/modulo/pecas',
+    tip:'<strong>Peças de Reposição</strong><em>Estoque · TAG · Consumo</em>Estoque de peças por TAG, histórico de consumo e ponto de pedido.' },
+  { icon:'📐', lbl:'Projetos<br>Manutenção', sub:'CAPEX',          color:'#4a7ab5', glow:'rgba(74,122,181,.35)', href:'/projetos',
+    tip:'<strong>Projetos de Manutenção</strong><em>CAPEX · Cronograma</em>Acompanhamento de projetos e melhorias estruturais.' },
+  { icon:'🔄', lbl:'Melhoria<br>Contínua',   sub:'Kaizen · PDCA',  color:'#2a9a5a', glow:'rgba(42,154,90,.35)',  href:'/melhoria',
+    tip:'<strong>Melhoria Contínua</strong><em>Kaizen · PDCA · OEE</em>Registro de kaizens, sugestões e resultados obtidos.' },
+  { icon:'⛑️', lbl:'Segurança<br>Trabalho',  sub:'NR-12 · EPI',    color:'#e07820', glow:'rgba(224,120,32,.35)', href:'/seguranca',
+    tip:'<strong>Segurança do Trabalho</strong><em>NR-12 · EPI · Laudos</em>Inspeções, EPI por colaborador e registro de ocorrências.' },
+  { icon:'👥', lbl:'Head Count<br>Manutenção', sub:'Equipe · Horas', color:'#5a9ab5', glow:'rgba(90,154,181,.35)', href:'/modulo/headcount',
+    tip:'<strong>Head Count Manutenção</strong><em>Equipe · Horas · Skills</em>Gestão da equipe, produtividade, treinamentos e competências.' },
+  { icon:'📁', lbl:'Documentos<br>Manutenção', sub:'Procedimentos', color:'#8a7ab5', glow:'rgba(138,122,181,.35)', href:'/documentos',
+    tip:'<strong>Documentos Manutenção</strong><em>Procedimentos · Manuais · SGI</em>Repositório de procedimentos, manuais técnicos e registros SGI.' },
+];
+
+const EXISTING = ['/formulario','/plano-acao','/agenda','/historico','/dashboard','/admin'];
+
+const cx = 360, cy = 360;     // centro da roda (coords internas do SVG, viewBox 720)
+const SCX = 410, SCY = 410;   // centro da cena em px (scene 820)
+const RORBIT = 350;           // raio da órbita das peças — FORA do pneu
+const N = MODULES.length;
+const scene = document.getElementById('scene');
+const svgEl = document.getElementById('wheelSvg');
+const SVGNS2 = 'http://www.w3.org/2000/svg';
+
+// ── Pneu 3D: tubo de borracha com seção arredondada ──
+(function buildTire() {
+  const tire = document.getElementById('tire');
+  const rOut = 362, rIn = 326, N = 16;
+  for (let i = 0; i < N; i++) {
+    const t = (i + 0.5) / N;                     // 0..1 ao longo da largura
+    const r = rOut - t * (rOut - rIn);
+    const round = Math.sin(t * Math.PI);         // 1 no centro do tubo, 0 nas bordas
+    const v = Math.round(8 + round * 42);        // tom de cinza (borracha)
+    const c = document.createElementNS(SVGNS2, 'circle');
+    c.setAttribute('cx', 360); c.setAttribute('cy', 360);
+    c.setAttribute('r', r.toFixed(1));
+    c.setAttribute('fill', 'none');
+    c.setAttribute('stroke', `rgb(${v},${v},${v + 2})`);
+    c.setAttribute('stroke-width', ((rOut - rIn) / N + 1.5).toFixed(1));
+    tire.appendChild(c);
+  }
+})();
+
+const cardObjs = [];  // {el, baseDeg}
+
+// ── Peças mecânicas desenhadas em SVG (com volume/relevo) ──
+const SHAPES = ['nut','gear','link','octa'];   // porca · engrenagem · elo · flange
+const C = 60;   // centro do viewBox 120x120
+
+function poly(c, r, n, rot) {
+  let o = [];
+  for (let i = 0; i < n; i++) {
+    const a = rot + i * 2 * Math.PI / n;
+    o.push((c + r * Math.cos(a)).toFixed(1) + ',' + (c + r * Math.sin(a)).toFixed(1));
+  }
+  return o.join(' ');
+}
+
+// PORCA SEXTAVADA
+function partNut(I) {
+  const out = poly(C, 56, 6, 0), inn = poly(C, 45, 6, 0);
+  return `<svg viewBox="0 0 120 120"><defs>
+    <linearGradient id="nb${I}" x1="0" y1="0" x2=".35" y2="1">
+      <stop offset="0" stop-color="#d6dde3"/><stop offset=".5" stop-color="#7e878f"/><stop offset="1" stop-color="#252a2f"/></linearGradient>
+    <radialGradient id="nf${I}" cx="40%" cy="34%" r="80%">
+      <stop offset="0" stop-color="#aeb8c1"/><stop offset=".5" stop-color="#5e676f"/><stop offset="1" stop-color="#23282d"/></radialGradient>
+    <radialGradient id="nh${I}" cx="42%" cy="38%" r="75%">
+      <stop offset="0" stop-color="#1a1e22"/><stop offset="1" stop-color="#000"/></radialGradient></defs>
+    <polygon points="${out}" fill="url(#nb${I})" stroke="#13161a" stroke-width="2.5" stroke-linejoin="round"/>
+    <polygon points="${inn}" fill="url(#nf${I})" stroke="rgba(255,255,255,.14)" stroke-width="1" stroke-linejoin="round"/>
+    <circle cx="60" cy="60" r="30" fill="url(#nh${I})" stroke="#0c0f12" stroke-width="2"/>
+    <circle cx="60" cy="60" r="30" fill="none" class="accent-ring" stroke-width="1.5" opacity=".55"/>
+    <circle cx="60" cy="60" r="25" fill="none" stroke="#2a2f35" stroke-width="2"/>
+    <circle cx="60" cy="60" r="21" fill="none" stroke="#15191d" stroke-width="1.5"/>
+    <path d="M40 48 A28 28 0 0 1 78 42" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="2" stroke-linecap="round"/>
+  </svg>`;
+}
+
+// ENGRENAGEM
+function partGear(I) {
+  const T = 11, ro = 57, rr = 47;
+  let p = '';
+  for (let i = 0; i < T * 2; i++) {
+    const a = i / (T * 2) * 2 * Math.PI - Math.PI / 2;
+    const r = i % 2 ? rr : ro;
+    p += (C + r * Math.cos(a)).toFixed(1) + ',' + (C + r * Math.sin(a)).toFixed(1) + ' ';
+  }
+  let holes = '';
+  for (let i = 0; i < 5; i++) {
+    const a = i / 5 * 2 * Math.PI - Math.PI / 2;
+    holes += `<circle cx="${(C + 35 * Math.cos(a)).toFixed(1)}" cy="${(C + 35 * Math.sin(a)).toFixed(1)}" r="4.5" fill="#0a0d10" stroke="rgba(255,255,255,.1)" stroke-width=".8"/>`;
+  }
+  return `<svg viewBox="0 0 120 120"><defs>
+    <radialGradient id="gf${I}" cx="40%" cy="34%" r="82%">
+      <stop offset="0" stop-color="#a4aeb7"/><stop offset=".5" stop-color="#576068"/><stop offset="1" stop-color="#20252a"/></radialGradient>
+    <radialGradient id="gh${I}" cx="42%" cy="36%" r="72%">
+      <stop offset="0" stop-color="#c2cad2"/><stop offset=".6" stop-color="#6b747c"/><stop offset="1" stop-color="#32373d"/></radialGradient></defs>
+    <polygon points="${p.trim()}" fill="url(#gf${I})" stroke="#13161a" stroke-width="1.5" stroke-linejoin="round"/>
+    <circle cx="60" cy="60" r="45" fill="none" stroke="rgba(0,0,0,.45)" stroke-width="2.5"/>
+    <circle cx="60" cy="60" r="44" fill="none" class="accent-ring" stroke-width="1.5" opacity=".5"/>
+    ${holes}
+    <circle cx="60" cy="60" r="29" fill="url(#gh${I})" stroke="#13161a" stroke-width="1.5"/>
+    <circle cx="60" cy="60" r="13" fill="#0a0d10" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
+    <path d="M38 46 A30 30 0 0 1 80 40" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="2" stroke-linecap="round"/>
+  </svg>`;
+}
+
+// ELO DE CORRENTE
+function partLink(I) {
+  return `<svg viewBox="0 0 120 120"><defs>
+    <linearGradient id="lk${I}" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#cfd6dd"/><stop offset=".5" stop-color="#5a636c"/><stop offset="1" stop-color="#23282d"/></linearGradient></defs>
+    <rect x="30" y="7" width="60" height="106" rx="30" fill="none" stroke="#0c0f12" stroke-width="22"/>
+    <rect x="30" y="7" width="60" height="106" rx="30" fill="none" stroke="url(#lk${I})" stroke-width="16"/>
+    <rect x="30" y="7" width="60" height="106" rx="30" fill="none" class="accent-ring" stroke-width="2.5" opacity=".5"/>
+    <rect x="30" y="7" width="60" height="106" rx="30" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="2.5" stroke-dasharray="20 150" stroke-dashoffset="-18"/>
+  </svg>`;
+}
+
+// FLANGE OCTOGONAL
+function partOcta(I) {
+  const out = poly(C, 57, 8, Math.PI / 8), inn = poly(C, 46, 8, Math.PI / 8);
+  let holes = '';
+  for (let i = 0; i < 8; i++) {
+    const a = i * 2 * Math.PI / 8;
+    holes += `<circle cx="${(C + 50 * Math.cos(a)).toFixed(1)}" cy="${(C + 50 * Math.sin(a)).toFixed(1)}" r="3.6" fill="#0a0d10" stroke="rgba(255,255,255,.08)" stroke-width=".6"/>`;
+  }
+  return `<svg viewBox="0 0 120 120"><defs>
+    <linearGradient id="ob${I}" x1="0" y1="0" x2=".35" y2="1">
+      <stop offset="0" stop-color="#d2d9e0"/><stop offset=".5" stop-color="#79828b"/><stop offset="1" stop-color="#262b30"/></linearGradient>
+    <radialGradient id="of${I}" cx="40%" cy="35%" r="80%">
+      <stop offset="0" stop-color="#a8b2bb"/><stop offset=".55" stop-color="#5a636b"/><stop offset="1" stop-color="#22272c"/></radialGradient>
+    <radialGradient id="oc${I}" cx="42%" cy="36%" r="72%">
+      <stop offset="0" stop-color="#c0c8d0"/><stop offset=".6" stop-color="#69727a"/><stop offset="1" stop-color="#30353b"/></radialGradient></defs>
+    <polygon points="${out}" fill="url(#ob${I})" stroke="#13161a" stroke-width="2.5" stroke-linejoin="round"/>
+    <polygon points="${inn}" fill="url(#of${I})" stroke="rgba(255,255,255,.12)" stroke-width="1" stroke-linejoin="round"/>
+    ${holes}
+    <circle cx="60" cy="60" r="30" fill="url(#oc${I})" stroke="#13161a" stroke-width="1.5"/>
+    <circle cx="60" cy="60" r="30" fill="none" class="accent-ring" stroke-width="1.5" opacity=".5"/>
+    <circle cx="60" cy="60" r="12" fill="#0a0d10" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
+    <path d="M40 48 A28 28 0 0 1 78 42" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="2" stroke-linecap="round"/>
+  </svg>`;
+}
+
+const PARTS = { nut: partNut, gear: partGear, link: partLink, octa: partOcta };
+
+// ── Criar cards distribuídos ao redor da roda ──
+MODULES.forEach((m, i) => {
+  const baseDeg = -90 + i * (360 / N);          // posição inicial (topo)
+  const ang = baseDeg * Math.PI / 180;
+  const x = SCX + RORBIT * Math.cos(ang) - 59;
+  const y = SCY + RORBIT * Math.sin(ang) - 59;
+  const exists = m.ext || EXISTING.includes(m.href) || m.href.startsWith('/modulo');
+
+  const shape = SHAPES[i % SHAPES.length];   // porca, engrenagem, elo, flange...
+
+  const a = document.createElement('a');
+  a.className = 'card';
+  a.style.left = x + 'px';
+  a.style.top  = y + 'px';
+  a.style.setProperty('--accent', m.color);
+  a.style.setProperty('--accent-glow', m.glow);
+  a.dataset.tip = m.tip;
+  a.innerHTML = `
+    ${exists ? '' : '<div class="soon">em breve</div>'}
+    <div class="part">${PARTS[shape](i)}</div>
+    <div class="card-content">
+      <div class="card-ico">${m.icon}</div>
+      <div class="card-lbl">${m.lbl}</div>
+      <div class="card-sub">${m.sub}</div>
+    </div>`;
+  if (exists) {
+    a.href = m.href;
+    if (m.ext) { a.target = '_blank'; a.rel = 'noopener'; }
+  } else {
+    a.style.opacity = '0.78';
+    a.onclick = (e) => { e.preventDefault(); openModal(m); };
+  }
+  a.style.animationDelay = (0.05 + i * 0.04) + 's';
+  scene.appendChild(a);
+  cardObjs.push({ el: a, baseDeg });
+});
+
+// ── Raios cruzados realistas (padrão 3-cross) ──
+const SVGNS = 'http://www.w3.org/2000/svg';
+const spokes      = document.getElementById('spokes');
+const nipplesG    = document.getElementById('nipples');
+const flangeHoles = document.getElementById('flangeHoles');
+const nSpokes  = 32;          // nº de raios (16 por lado)
+const cross    = 3;           // cruzamentos
+const rFlange  = 50;          // raio da flange (saída dos raios)
+const rRim     = 311;         // raio do aro (chegada dos raios)
+
+for (let i = 0; i < nSpokes; i++) {
+  const side  = i % 2;                       // alterna os dois lados do cubo
+  const flAng = (i / nSpokes) * Math.PI * 2; // posição na flange
+  // o raio sai da flange e chega ao aro deslocado por 'cross' furos
+  const dir   = side === 0 ? 1 : -1;
+  const rimAng = flAng + dir * (cross * 2) * (Math.PI / nSpokes);
+
+  const x1 = cx + rFlange * Math.cos(flAng);
+  const y1 = cy + rFlange * Math.sin(flAng);
+  const x2 = cx + rRim    * Math.cos(rimAng);
+  const y2 = cy + rRim    * Math.sin(rimAng);
+
+  // corpo do raio com leve brilho metálico
+  const sp = document.createElementNS(SVGNS,'line');
+  sp.setAttribute('x1', x1); sp.setAttribute('y1', y1);
+  sp.setAttribute('x2', x2); sp.setAttribute('y2', y2);
+  sp.setAttribute('stroke', side === 0 ? '#6b7682' : '#3a4148');
+  sp.setAttribute('stroke-width', '1.4');
+  sp.setAttribute('stroke-linecap', 'round');
+  sp.setAttribute('opacity', '0.9');
+  spokes.appendChild(sp);
+
+  // realce (highlight) fino sobre o raio
+  const hl = document.createElementNS(SVGNS,'line');
+  hl.setAttribute('x1', x1); hl.setAttribute('y1', y1);
+  hl.setAttribute('x2', x2); hl.setAttribute('y2', y2);
+  hl.setAttribute('stroke', 'rgba(255,255,255,0.18)');
+  hl.setAttribute('stroke-width', '0.5');
+  spokes.appendChild(hl);
+
+  // niple no aro
+  const nip = document.createElementNS(SVGNS,'circle');
+  nip.setAttribute('cx', cx + 316 * Math.cos(rimAng));
+  nip.setAttribute('cy', cy + 316 * Math.sin(rimAng));
+  nip.setAttribute('r', '2.4');
+  nip.setAttribute('fill', '#aab4be');
+  nip.setAttribute('stroke', '#1a1a1a');
+  nip.setAttribute('stroke-width', '0.5');
+  nipplesG.appendChild(nip);
+
+  // furo na flange
+  const fh = document.createElementNS(SVGNS,'circle');
+  fh.setAttribute('cx', x1);
+  fh.setAttribute('cy', y1);
+  fh.setAttribute('r', '2');
+  fh.setAttribute('fill', '#0a0a0a');
+  fh.setAttribute('stroke', '#555');
+  fh.setAttribute('stroke-width', '0.5');
+  flangeHoles.appendChild(fh);
+}
+
+// ── Coroa de marchas (chainring) no centro da roda ──
+const chainring = document.createElementNS(SVGNS2,'g');
+chainring.setAttribute('id','chainring');
+(function buildChainring(){
+  const T = 38, ro = 150, rr = 138;          // dentes
+  let tp = '';
+  for (let i = 0; i < T * 2; i++) {
+    const a = i / (T * 2) * 2 * Math.PI;
+    const r = i % 2 ? rr : ro;
+    tp += (cx + r * Math.cos(a)).toFixed(1) + ',' + (cy + r * Math.sin(a)).toFixed(1) + ' ';
+  }
+  let win = '';   // 5 janelas de alívio (entre os braços)
+  for (let i = 0; i < 5; i++)
+    win += `<rect x="${cx-19}" y="${cy-132}" width="38" height="66" rx="19" fill="#0d0d0d" transform="rotate(${i*72} ${cx} ${cy})"/>`;
+  let blt = '';   // 5 parafusos da coroa
+  for (let i = 0; i < 5; i++)
+    blt += `<g transform="rotate(${i*72+36} ${cx} ${cy})">
+              <circle cx="${cx}" cy="${cy-116}" r="7.5" fill="#191d22" stroke="#727b84" stroke-width="2"/>
+              <circle cx="${cx}" cy="${cy-116}" r="3" fill="#0a0d10"/></g>`;
+  chainring.innerHTML = `
+    <polygon points="${tp.trim()}" fill="url(#rimGrad)" stroke="#0c0f12" stroke-width="2" stroke-linejoin="round"/>
+    <circle cx="${cx}" cy="${cy}" r="135" fill="url(#flangeGrad)" stroke="#0c0f12" stroke-width="2"/>
+    <circle cx="${cx}" cy="${cy}" r="132" fill="none" stroke="var(--red)"  stroke-width="3" opacity=".85"/>
+    <circle cx="${cx}" cy="${cy}" r="125" fill="none" stroke="var(--blue)" stroke-width="3" opacity=".85"/>
+    ${win}
+    ${blt}
+    <circle cx="${cx}" cy="${cy}" r="60" fill="url(#hubGrad)" stroke="#0c0f12" stroke-width="2"/>
+    <circle cx="${cx}" cy="${cy}" r="60" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
+    <path d="M${cx-40} ${cy-30} A50 50 0 0 1 ${cx+34} ${cy-38}" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="3" stroke-linecap="round"/>`;
+  svgEl.appendChild(chainring);
+})();
+
+// ── Rotação de toda a roda — raios, niples, pneu E os cards ──
+let deg = 0;
+let paused = false;
+const SPEED = 0.035;          // graus por frame (~2,4 min por volta, bem lento)
+function animWheel() {
+  if (!paused) deg = (deg + SPEED) % 360;
+  const t = `rotate(${deg}, 360, 360)`;
+  spokes.setAttribute('transform', t);
+  nipplesG.setAttribute('transform', t);
+  flangeHoles.setAttribute('transform', t);
+  chainring.setAttribute('transform', t);
+  document.getElementById('tread').setAttribute('transform', t);
+
+  // peças orbitam por FORA do pneu, mas permanecem na vertical (texto legível)
+  cardObjs.forEach(c => {
+    const rad = (c.baseDeg + deg) * Math.PI / 180;
+    c.el.style.left = (SCX + RORBIT * Math.cos(rad) - 59) + 'px';
+    c.el.style.top  = (SCY + RORBIT * Math.sin(rad) - 59) + 'px';
+  });
+  requestAnimationFrame(animWheel);
+}
+animWheel();
+
+// ── Tooltip ──
+const tip = document.getElementById('tip');
+document.addEventListener('mousemove', e => {
+  const card = e.target.closest('.card');
+  paused = !!card;          // pausa a roda ao passar sobre um card
+  if (card) {
+    tip.innerHTML = card.dataset.tip;
+    tip.classList.add('show');
+    let lx = e.clientX + 16, ly = e.clientY - 12;
+    if (lx + 230 > window.innerWidth) lx = e.clientX - 236;
+    tip.style.left = lx + 'px';
+    tip.style.top  = ly + 'px';
+  } else {
+    tip.classList.remove('show');
+  }
+});
+
+// ── Modal "em breve" ──
+function openModal(m) {
+  document.getElementById('modalIco').textContent = m.icon;
+  document.getElementById('modalTitle').textContent = m.lbl.replace('<br>', ' ');
+  document.getElementById('modalDesc').innerHTML =
+    `Este módulo está em desenvolvimento e será disponibilizado nas próximas versões do SGM.<br><br>
+     <em style="color:#555">${m.sub}</em>`;
+  document.getElementById('overlay').classList.add('show');
+}
+function closeModal() {
+  document.getElementById('overlay').classList.remove('show');
+}
+</script>
+</body>
+</html>

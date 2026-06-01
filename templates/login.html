@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login · SGM Caloi</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--red:#d4232a;--blue:#1f3a8f;--ink:#1d2430;--muted:#6b7686;--line:#e6e9ef;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(ellipse at 50% 30%,#c11f25 0%,#921519 55%,#5e0d10 100%);}
+  .card{background:#fff;border-radius:18px;padding:38px 34px;width:360px;
+    box-shadow:0 20px 50px rgba(0,0,0,.4);border-top:5px solid var(--red);}
+  .logo{text-align:center;margin-bottom:22px;}
+  .logo .wm{font-family:'Arial Black',sans-serif;font-style:italic;font-weight:900;font-size:40px;
+    color:var(--red);-webkit-text-stroke:1.6px var(--blue);}
+  .logo .sub{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-top:2px;}
+  label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:600;display:block;margin:14px 0 5px;}
+  input{width:100%;border:1px solid var(--line);border-radius:9px;padding:11px 12px;font-size:14px;font-family:inherit;}
+  input:focus{outline:none;border-color:var(--blue);}
+  button{width:100%;margin-top:22px;background:var(--red);color:#fff;border:none;border-radius:9px;
+    padding:12px;font-size:14px;font-weight:700;letter-spacing:1px;cursor:pointer;text-transform:uppercase;}
+  button:hover{background:#a01218;}
+  .erro{background:#fdeaea;color:var(--red);border-radius:8px;padding:9px 12px;font-size:13px;margin-top:14px;text-align:center;}
+  .hint{margin-top:18px;font-size:11px;color:var(--muted);text-align:center;line-height:1.6;}
+</style>
+</head>
+<body>
+  <form class="card" method="POST" action="/login">
+    <div class="logo">
+      <div class="wm">CALOi</div>
+      <div class="sub">SGM · Gestão de Manutenção</div>
+    </div>
+    {% if request.args.get('next') %}<input type="hidden" name="next" value="{{ request.args.get('next') }}">{% endif %}
+    <label>Usuário</label>
+    <input name="username" autofocus autocomplete="username">
+    <label>Senha</label>
+    <input name="senha" type="password" autocomplete="current-password">
+    <button type="submit">Entrar</button>
+    {% if erro %}<div class="erro">{{ erro }}</div>{% endif %}
+    <div class="hint">Acesso padrão: <b>admin</b> / <b>admin123</b><br>(altere após o primeiro acesso)</div>
+  </form>
+</body>
+</html>

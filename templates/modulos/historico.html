@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard · Histórico por TAG — SGM Caloi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root{--red:#d4232a;--red-d:#a01218;--blue:#1f3a8f;--ink:#1d2430;--muted:#6b7686;
+    --line:#e6e9ef;--bg:#f3f5f9;--card:#fff;--green:#15924c;--amber:#d68a12;--purple:#7a5cc8;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;}
+  a{text-decoration:none;color:inherit;}
+  .topbar{background:#fff;border-bottom:3px solid var(--ink);padding:14px 28px;display:flex;
+    align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,.05);}
+  .topbar h1{font-family:'Oswald',sans-serif;font-weight:700;font-size:20px;letter-spacing:1px;
+    text-transform:uppercase;display:flex;align-items:center;gap:10px;}
+  .topbar h1 .ico{color:var(--ink);font-size:22px;}
+  .top-actions{display:flex;gap:10px;align-items:center;}
+  .btn{border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;
+    display:inline-flex;align-items:center;gap:7px;transition:.2s;}
+  .btn-tpm{background:var(--ink);color:#fff;} .btn-tpm:hover{filter:brightness(1.3);}
+  .btn-ghost{background:#eef1f6;color:var(--ink);} .btn-ghost:hover{background:#e2e7f0;}
+  .wrap{max-width:1280px;margin:0 auto;padding:22px 28px 50px;}
+  .picker{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:20px;
+    display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;}
+  .field{display:flex;flex-direction:column;gap:4px;}
+  .field label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:600;}
+  .field select,.field input{border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-size:14px;
+    font-family:inherit;color:var(--ink);background:#fff;min-width:220px;}
+  .field select:focus,.field input:focus{outline:none;border-color:var(--blue);}
+  .spacer{flex:1;}
+  .updated{font-size:11px;color:var(--muted);text-align:right;} .updated b{color:var(--green);}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:22px;}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden;}
+  .kpi::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c,var(--blue));}
+  .kpi .v{font-family:'Oswald',sans-serif;font-size:28px;font-weight:700;line-height:1;}
+  .kpi .u{font-size:13px;color:var(--muted);font-weight:600;}
+  .kpi .k{font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-top:6px;font-weight:600;}
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px;}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;}
+  .panel h3{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:700;
+    margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+  .panel h3 .dot{width:8px;height:8px;border-radius:50%;background:var(--blue);}
+  .c-8{grid-column:span 8;} .c-6{grid-column:span 6;} .c-4{grid-column:span 4;} .c-12{grid-column:span 12;}
+  .chart-box{position:relative;height:280px;} .chart-box.sm{height:240px;}
+  @media(max-width:920px){.c-8,.c-6,.c-4{grid-column:span 12;}}
+  .head-eq{background:#fff;border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:12px;
+    padding:14px 18px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+  .head-eq .nome{font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;}
+  .head-eq .cod{color:var(--blue);font-weight:700;}
+  .table-tools{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:24px 0 10px;flex-wrap:wrap;}
+  .table-tools h2{font-family:'Oswald',sans-serif;font-size:18px;letter-spacing:.5px;text-transform:uppercase;}
+  table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:13px;}
+  thead th{background:#f7f9fc;text-align:left;padding:10px 12px;font-size:11px;letter-spacing:.5px;
+    text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line);white-space:nowrap;cursor:pointer;}
+  tbody td{padding:9px 12px;border-bottom:1px solid #f1f3f7;vertical-align:top;}
+  tbody tr:hover{background:#fafbfe;}
+  .badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;text-transform:uppercase;letter-spacing:.5px;}
+  .b-ok{background:#e8f4ec;color:var(--green);} .b-open{background:#fdf3e3;color:var(--amber);}
+  .rank td:first-child{font-weight:600;} .rank .tag-pill{font-family:'Oswald',sans-serif;color:var(--blue);font-weight:600;}
+  .muted{color:var(--muted);font-size:12px;}
+  .empty{background:#fff;border:1px dashed var(--line);border-radius:12px;padding:50px;text-align:center;color:var(--muted);}
+  .hint{background:#eef4ff;border:1px solid #d6e2ff;color:#33508f;border-radius:10px;padding:12px 16px;font-size:13px;margin-bottom:18px;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <h1><span class="ico">🔍</span> Histórico por TAG / Equipamento</h1>
+  <div class="top-actions">
+    <a class="btn btn-tpm" href="{{ tpm_url or '#' }}" target="_blank" rel="noopener">➕ Abrir TPM</a>
+    <a class="btn btn-ghost" href="/portal">← Voltar à Capa</a>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="picker">
+    <div class="field"><label>Equipamento</label><select id="fEquip"><option value="">— selecione —</option></select></div>
+    <div class="field"><label>ou buscar por código / nome</label><input id="fBuscaEq" type="text" placeholder="Ex.: EQ001, Prensa..."></div>
+    <div class="spacer"></div>
+    <div class="updated">Fonte: OS do TPM · <b>online</b><br><span class="muted" id="totalInfo"></span></div>
+  </div>
+
+  <!-- visão geral (sem equipamento selecionado) -->
+  <div id="overview">
+    <div class="hint">Selecione um equipamento acima para ver o histórico completo dele. Abaixo, o ranking geral por nº de paradas.</div>
+    <div class="grid">
+      <div class="panel c-6"><h3><span class="dot"></span>Equipamentos com mais paradas</h3><div class="chart-box"><canvas id="chRankOs"></canvas></div></div>
+      <div class="panel c-6"><h3><span class="dot"></span>Equipamentos com mais horas paradas</h3><div class="chart-box"><canvas id="chRankH"></canvas></div></div>
+    </div>
+    <div class="table-tools"><h2>Ranking de equipamentos</h2>
+      <input id="fBuscaRank" type="text" placeholder="🔎 Buscar..." style="border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:13px;min-width:240px;"></div>
+    <div style="overflow-x:auto;"><table id="tblRank"><thead><tr><th>Equipamento</th><th>Código</th><th>OS</th><th>Horas paradas</th><th>MTTR</th><th>Última parada</th></tr></thead><tbody id="rankBody"></tbody></table></div>
+  </div>
+
+  <!-- detalhe do equipamento -->
+  <div id="detail" style="display:none;">
+    <div class="head-eq">
+      <div><div class="nome" id="eqNome">—</div><div class="muted">Código: <span class="cod" id="eqCod">—</span> · Setor: <span id="eqSetor">—</span></div></div>
+      <button class="btn btn-ghost" id="btnVoltarRank">↩ Ver ranking geral</button>
+    </div>
+    <div class="kpis" id="kpis"></div>
+    <div class="grid">
+      <div class="panel c-8"><h3><span class="dot"></span>Paradas e horas por mês</h3><div class="chart-box"><canvas id="chMes"></canvas></div></div>
+      <div class="panel c-4"><h3><span class="dot"></span>Motivos de parada</h3><div class="chart-box sm"><canvas id="chMotivo"></canvas></div></div>
+    </div>
+    <div class="table-tools"><h2>Histórico de OS do equipamento</h2></div>
+    <div style="overflow-x:auto;"><table id="tblHist"><thead><tr id="thead"></tr></thead><tbody id="histBody"></tbody></table></div>
+    <p class="muted" id="histInfo" style="margin-top:8px;"></p>
+  </div>
+
+  <div class="empty" id="empty" style="display:none;">
+    <div style="font-size:40px;margin-bottom:10px;">🔍</div>
+    <strong>Sem OS registradas ainda.</strong><br>O histórico é construído a partir das OS do TPM (<code>Manutencao_TPM.xlsx</code>).
+  </div>
+</div>
+
+<script>
+const RECORDS = {{ records_json | tojson }};
+const KEYS = RECORDS.length ? Object.keys(RECORDS[0]) : [];
+function findKey(...c){for(const x of c){const k=KEYS.find(k=>k.toLowerCase().includes(x));if(k)return k;}return null;}
+const F={
+  data:findKey('ocorr','data/hora','data'),
+  tag:findKey('código','codigo','cód'),
+  equip:findKey('equipamento','máquina','maquina'),
+  setor:findKey('setor','área','area'),
+  tec:findKey('técnic','tecnic','respons'),
+  horas:findKey('total horas','horas parad','horas','tempo'),
+  motivo:findKey('motivo'),
+  solucao:findKey('solução','solucao'),
+  status:findKey('status','situa'),
+};
+function parseData(v){if(!v)return null;const s=String(v);
+  let m=s.match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);
+  m=s.match(/(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})/);if(m)return new Date(+m[3],+m[2]-1,+m[1]);
+  const d=new Date(s);return isNaN(d)?null:d;}
+function num(v){const n=parseFloat(String(v).replace(',','.'));return isNaN(n)?0:n;}
+function val(r,k){return k&&r[k]!=null?r[k]:'';}
+function lower(x){return String(x||'').toLowerCase();}
+RECORDS.forEach(r=>{r._d=parseData(val(r,F.data));r._h=num(val(r,F.horas));
+  r._eq=String(val(r,F.equip)).trim()||'(sem equip.)';r._cod=String(val(r,F.tag)).trim();});
+
+// agrupa por equipamento
+const grupos={};
+RECORDS.forEach(r=>{const k=r._eq;(grupos[k]=grupos[k]||{eq:r._eq,cod:r._cod,setor:String(val(r,F.setor)).trim(),rows:[]}).rows.push(r);});
+const lista=Object.values(grupos).map(g=>{const hs=g.rows.reduce((a,r)=>a+r._h,0);const ch=g.rows.filter(r=>r._h>0).length;
+  const datas=g.rows.map(r=>r._d).filter(Boolean).sort((a,b)=>b-a);
+  return {...g,os:g.rows.length,horas:hs,mttr:ch?hs/ch:0,ultima:datas[0]||null};}).sort((a,b)=>b.os-a.os);
+
+// popular seletor
+const elEq=fEquip,elBuscaEq=fBuscaEq;
+lista.forEach(g=>elEq.add(new Option(`${g.eq}${g.cod?' ('+g.cod+')':''}`,g.eq)));
+totalInfo.textContent=`${RECORDS.length} OS · ${lista.length} equipamentos`;
+
+let charts={};
+const C={red:'#d4232a',blue:'#1f3a8f',green:'#15924c',amber:'#d68a12',gray:'#9aa4b2',purple:'#7a5cc8'};
+function mk(id,cfg){if(charts[id])charts[id].destroy();charts[id]=new Chart(document.getElementById(id),cfg);}
+function baseOpt(axis){return{responsive:true,maintainAspectRatio:false,indexAxis:axis||'x',
+  plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:'#eef1f6'}}}};}
+
+// ── VISÃO GERAL (ranking) ──
+function renderOverview(){
+  const top=lista.slice(0,10);
+  mk('chRankOs',{type:'bar',data:{labels:top.map(g=>g.eq),datasets:[{data:top.map(g=>g.os),backgroundColor:C.blue,borderRadius:5}]},options:baseOpt('y')});
+  const topH=[...lista].sort((a,b)=>b.horas-a.horas).slice(0,10);
+  mk('chRankH',{type:'bar',data:{labels:topH.map(g=>g.eq),datasets:[{data:topH.map(g=>+g.horas.toFixed(1)),backgroundColor:C.red,borderRadius:5}]},options:baseOpt('y')});
+  renderRank();
+}
+function renderRank(){
+  const b=lower(fBuscaRank.value);
+  const data=lista.filter(g=>!b||lower(g.eq).includes(b)||lower(g.cod).includes(b));
+  rankBody.innerHTML=data.map(g=>`<tr class="rank" style="cursor:pointer" data-eq="${g.eq.replace(/"/g,'&quot;')}">
+    <td>${g.eq}</td><td><span class="tag-pill">${g.cod||'—'}</span></td><td>${g.os}</td>
+    <td>${g.horas.toFixed(1)} h</td><td>${g.mttr.toFixed(2)} h</td>
+    <td>${g.ultima?g.ultima.toLocaleDateString('pt-BR'):'—'}</td></tr>`).join('');
+  rankBody.querySelectorAll('tr').forEach(tr=>tr.onclick=()=>selecionar(tr.dataset.eq));
+}
+
+// ── DETALHE ──
+const HCOLS=[{k:F.data,t:'Data'},{k:F.horas,t:'Horas'},{k:F.motivo,t:'Motivo'},{k:F.solucao,t:'Solução'},{k:F.tec,t:'Técnico'},{k:F.status,t:'Status'}].filter(c=>c.k);
+function selecionar(eq){
+  if(!grupos[eq]){return;}
+  elEq.value=eq;
+  overview.style.display='none'; detail.style.display='block';
+  const g=grupos[eq]; const rows=[...g.rows].sort((a,b)=>(b._d||0)-(a._d||0));
+  eqNome.textContent=g.eq; eqCod.textContent=g.cod||'—'; eqSetor.textContent=g.setor||'—';
+  // KPIs
+  const hs=rows.reduce((a,r)=>a+r._h,0), ch=rows.filter(r=>r._h>0).length;
+  const conc=rows.filter(r=>lower(val(r,F.status)).includes('conclu')).length;
+  const datas=rows.map(r=>r._d).filter(Boolean).sort((a,b)=>a-b);
+  const cards=[
+    {v:rows.length,k:'OS no histórico',c:'var(--blue)'},
+    {v:hs.toFixed(1),u:'h',k:'Horas paradas',c:'var(--red)'},
+    {v:(ch?hs/ch:0).toFixed(2),u:'h',k:'MTTR',c:'var(--amber)'},
+    {v:conc,k:'Concluídas',c:'var(--green)'},
+    {v:rows.length-conc,k:'Pendentes',c:'var(--amber)'},
+    {v:datas.length?datas[datas.length-1].toLocaleDateString('pt-BR'):'—',k:'Última parada',c:'var(--purple)'},
+  ];
+  kpis.innerHTML=cards.map(c=>`<div class="kpi" style="--c:${c.c}"><div class="v" style="font-size:${String(c.v).length>8?'18px':'28px'}">${c.v}${c.u?` <span class="u">${c.u}</span>`:''}</div><div class="k">${c.k}</div></div>`).join('');
+  // gráfico por mês (paradas + horas)
+  const byMes={},hMes={};
+  rows.forEach(r=>{if(r._d){const k=`${r._d.getFullYear()}-${String(r._d.getMonth()+1).padStart(2,'0')}`;byMes[k]=(byMes[k]||0)+1;hMes[k]=(hMes[k]||0)+r._h;}});
+  const mk_=Object.keys(byMes).sort();
+  mk('chMes',{data:{labels:mk_,datasets:[
+    {type:'bar',label:'Paradas',data:mk_.map(k=>byMes[k]),backgroundColor:C.blue,borderRadius:5,yAxisID:'y'},
+    {type:'line',label:'Horas',data:mk_.map(k=>+hMes[k].toFixed(1)),borderColor:C.red,backgroundColor:'rgba(212,35,42,.12)',tension:.3,yAxisID:'y1'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{boxWidth:12,font:{size:11}}}},
+      scales:{y:{beginAtZero:true,position:'left',grid:{color:'#eef1f6'}},y1:{beginAtZero:true,position:'right',grid:{display:false}}}}});
+  // motivos
+  const mm={};rows.forEach(r=>{const v=String(val(r,F.motivo)).trim()||'(sem)';mm[v]=(mm[v]||0)+1;});
+  const mk2=Object.entries(mm).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  mk('chMotivo',{type:'doughnut',data:{labels:mk2.map(e=>e[0]),datasets:[{data:mk2.map(e=>e[1]),
+    backgroundColor:[C.red,C.amber,C.purple,C.blue,C.green,C.gray]}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{boxWidth:11,font:{size:10}}}}}});
+  // tabela
+  thead.innerHTML=HCOLS.map(c=>`<th>${c.t}</th>`).join('');
+  histBody.innerHTML=rows.map(r=>`<tr>${HCOLS.map(c=>{
+    let v=val(r,c.k),cell=v;
+    if(c.k===F.data&&r._d)cell=r._d.toLocaleDateString('pt-BR');
+    else if(c.k===F.horas)cell=v!==''?num(v).toFixed(1)+' h':'—';
+    else if(c.k===F.status){const s=lower(v);cell=`<span class="badge ${s.includes('conclu')?'b-ok':'b-open'}">${v||'—'}</span>`;}
+    else cell=v===''?'—':v;
+    return `<td>${cell}</td>`;}).join('')}</tr>`).join('');
+  histInfo.textContent=`${rows.length} OS no histórico deste equipamento.`;
+}
+function verRank(){detail.style.display='none';overview.style.display='block';elEq.value='';}
+
+elEq.addEventListener('change',()=>{if(elEq.value)selecionar(elEq.value);else verRank();});
+elBuscaEq.addEventListener('input',()=>{const b=lower(elBuscaEq.value);
+  if(!b)return;const hit=lista.find(g=>lower(g.eq).includes(b)||lower(g.cod).includes(b));if(hit)selecionar(hit.eq);});
+fBuscaRank.addEventListener('input',renderRank);
+btnVoltarRank.addEventListener('click',verRank);
+
+if(!RECORDS.length){overview.style.display='none';empty.style.display='block';}else{renderOverview();}
+</script>
+</body>
+</html>

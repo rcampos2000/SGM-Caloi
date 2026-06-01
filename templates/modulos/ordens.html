@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard · OS de Manutenção — SGM Caloi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --red:#d4232a; --red-d:#a01218; --blue:#1f3a8f;
+    --ink:#1d2430; --muted:#6b7686; --line:#e6e9ef;
+    --bg:#f3f5f9; --card:#ffffff; --green:#15924c; --amber:#d68a12;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;}
+  a{text-decoration:none;color:inherit;}
+  .topbar{background:#fff;border-bottom:3px solid var(--red);padding:14px 28px;
+    display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;
+    box-shadow:0 2px 10px rgba(0,0,0,.05);}
+  .topbar h1{font-family:'Oswald',sans-serif;font-weight:700;font-size:20px;letter-spacing:1px;
+    text-transform:uppercase;display:flex;align-items:center;gap:10px;}
+  .topbar h1 .ico{color:var(--red);font-size:22px;}
+  .top-actions{display:flex;gap:10px;align-items:center;}
+  .btn{border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;
+    display:inline-flex;align-items:center;gap:7px;transition:.2s;}
+  .btn-tpm{background:var(--red);color:#fff;} .btn-tpm:hover{background:var(--red-d);}
+  .btn-ghost{background:#eef1f6;color:var(--ink);} .btn-ghost:hover{background:#e2e7f0;}
+  .wrap{max-width:1280px;margin:0 auto;padding:22px 28px 50px;}
+  .filters{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;
+    display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-bottom:20px;}
+  .field{display:flex;flex-direction:column;gap:4px;}
+  .field label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:600;}
+  .field select,.field input{border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;
+    font-family:inherit;color:var(--ink);background:#fff;min-width:150px;}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--blue);}
+  .filters .spacer{flex:1;}
+  .updated{font-size:11px;color:var(--muted);text-align:right;}
+  .updated b{color:var(--green);}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:22px;}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden;}
+  .kpi::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c,var(--red));}
+  .kpi .v{font-family:'Oswald',sans-serif;font-size:30px;font-weight:700;line-height:1;color:var(--ink);}
+  .kpi .u{font-size:13px;color:var(--muted);font-weight:600;}
+  .kpi .k{font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-top:6px;font-weight:600;}
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px;}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;}
+  .panel h3{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:700;
+    margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+  .panel h3 .dot{width:8px;height:8px;border-radius:50%;background:var(--red);}
+  .c-8{grid-column:span 8;} .c-6{grid-column:span 6;} .c-4{grid-column:span 4;} .c-12{grid-column:span 12;}
+  .chart-box{position:relative;height:280px;} .chart-box.sm{height:250px;}
+  @media(max-width:920px){.c-8,.c-6,.c-4{grid-column:span 12;}}
+  .table-tools{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:24px 0 10px;flex-wrap:wrap;}
+  .table-tools h2{font-family:'Oswald',sans-serif;font-size:18px;letter-spacing:.5px;text-transform:uppercase;}
+  table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:13px;}
+  thead th{background:#f7f9fc;text-align:left;padding:10px 12px;font-size:11px;letter-spacing:.5px;
+    text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line);white-space:nowrap;cursor:pointer;}
+  tbody td{padding:9px 12px;border-bottom:1px solid #f1f3f7;vertical-align:top;}
+  tbody tr:hover{background:#fafbfe;}
+  .tag-pill{font-family:'Oswald',sans-serif;font-weight:600;color:var(--blue);}
+  .badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;text-transform:uppercase;letter-spacing:.5px;}
+  .b-ok{background:#e8f4ec;color:var(--green);} .b-open{background:#fdf3e3;color:var(--amber);}
+  .empty{background:#fff;border:1px dashed var(--line);border-radius:12px;padding:50px;text-align:center;color:var(--muted);}
+  .muted{color:var(--muted);font-size:12px;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <h1><span class="ico">🔧</span> Dashboard · Ordens de Serviço</h1>
+  <div class="top-actions">
+    <a class="btn btn-tpm" href="{{ tpm_url or '#' }}" target="_blank" rel="noopener">➕ Registrar OS (TPM)</a>
+    <a class="btn btn-ghost" href="/portal">← Voltar à Capa</a>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="filters">
+    <div class="field"><label>Ano</label><select id="fAno"><option value="">Todos</option></select></div>
+    <div class="field"><label>Mês</label><select id="fMes"><option value="">Todos</option></select></div>
+    <div class="field"><label>Setor</label><select id="fSetor"><option value="">Todos</option></select></div>
+    <div class="field"><label>Status</label><select id="fStatus"><option value="">Todos</option></select></div>
+    <div class="field"><label>Equipamento / Código</label><input id="fTag" type="text" placeholder="Buscar..."></div>
+    <div class="spacer"></div>
+    <div class="updated">Atualizado a cada acesso · <b>online</b><br><span class="muted" id="totalInfo"></span></div>
+  </div>
+
+  <div id="content">
+    <div class="kpis" id="kpis"></div>
+    <div class="grid">
+      <div class="panel c-8"><h3><span class="dot"></span>Paradas por mês</h3><div class="chart-box"><canvas id="chMes"></canvas></div></div>
+      <div class="panel c-4"><h3><span class="dot"></span>Status</h3><div class="chart-box sm"><canvas id="chStatus"></canvas></div></div>
+      <div class="panel c-6"><h3><span class="dot"></span>Top equipamentos (nº de paradas)</h3><div class="chart-box"><canvas id="chEquip"></canvas></div></div>
+      <div class="panel c-6"><h3><span class="dot"></span>Principais motivos de parada</h3><div class="chart-box"><canvas id="chMotivo"></canvas></div></div>
+      <div class="panel c-8"><h3><span class="dot"></span>Horas paradas por mês</h3><div class="chart-box sm"><canvas id="chHoras"></canvas></div></div>
+      <div class="panel c-4"><h3><span class="dot"></span>Horas paradas por setor</h3><div class="chart-box sm"><canvas id="chSetor"></canvas></div></div>
+    </div>
+
+    <div class="table-tools">
+      <h2>Detalhamento das OS</h2>
+      <input id="fBusca" type="text" placeholder="🔎 Buscar em toda a tabela..."
+        style="border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:13px;min-width:260px;">
+    </div>
+    <div style="overflow-x:auto;"><table id="tbl"><thead><tr id="thead"></tr></thead><tbody id="tbody"></tbody></table></div>
+    <p class="muted" id="tblInfo" style="margin-top:8px;"></p>
+  </div>
+
+  <div class="empty" id="empty" style="display:none;">
+    <div style="font-size:40px;margin-bottom:10px;">📭</div>
+    <strong>Sem OS registradas ainda.</strong><br>
+    O dashboard lê o Excel do TPM (<code>Manutencao_TPM.xlsx</code>). Assim que houver registros, os indicadores aparecem aqui.
+  </div>
+</div>
+
+<script>
+const RECORDS = {{ records_json | tojson }};
+
+// ── Detecção das colunas (esquema real do TPM, com tolerância) ──
+const KEYS = RECORDS.length ? Object.keys(RECORDS[0]) : [];
+function findKey(...cands){
+  for(const c of cands){ const k = KEYS.find(k=>k.toLowerCase().includes(c)); if(k) return k; }
+  return null;
+}
+const F = {
+  data:   findKey('ocorr','data/hora','data'),
+  tag:    findKey('código','codigo','cód','tag'),
+  equip:  findKey('equipamento','máquina','maquina'),
+  tec:    findKey('técnic','tecnic','respons'),
+  setor:  findKey('setor','área','area'),
+  horas:  findKey('total horas','horas parad','horas','tempo','duração','duracao'),
+  motivo: findKey('motivo'),
+  solucao:findKey('solução','solucao','solução do'),
+  status: findKey('status','situa'),
+  parada: findKey('horário de parada','hora parada'),
+  lib:    findKey('horário de liber','hora liber'),
+};
+
+function parseData(v){
+  if(!v) return null;
+  const s=String(v);
+  let m=s.match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
+  if(m) return new Date(+m[1],+m[2]-1,+m[3]);
+  m=s.match(/(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})/);
+  if(m) return new Date(+m[3],+m[2]-1,+m[1]);
+  const d=new Date(s); return isNaN(d)?null:d;
+}
+function num(v){ const n=parseFloat(String(v).replace(',','.')); return isNaN(n)?0:n; }
+function val(r,k){ return k && r[k]!=null ? r[k] : ''; }
+function lower(x){ return String(x||'').toLowerCase(); }
+RECORDS.forEach(r=>{ r._d=parseData(val(r,F.data)); r._h=num(val(r,F.horas)); });
+
+// ── Filtros ──
+const anos=[...new Set(RECORDS.map(r=>r._d?r._d.getFullYear():null).filter(Boolean))].sort((a,b)=>b-a);
+const setores=[...new Set(RECORDS.map(r=>String(val(r,F.setor)).trim()).filter(Boolean))].sort();
+const statuses=[...new Set(RECORDS.map(r=>String(val(r,F.status)).trim()).filter(Boolean))];
+const MES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const elAno=fAno,elMes=fMes,elSetor=fSetor,elStatus=fStatus,elTag=fTag,elBusca=fBusca;
+anos.forEach(a=>elAno.add(new Option(a,a)));
+MES.forEach((m,i)=>elMes.add(new Option(m,i+1)));
+setores.forEach(s=>elSetor.add(new Option(s,s)));
+statuses.forEach(s=>elStatus.add(new Option(s,s)));
+
+function filtrar(){
+  const a=elAno.value,mes=elMes.value,se=lower(elSetor.value),st=lower(elStatus.value),tag=lower(elTag.value);
+  return RECORDS.filter(r=>{
+    if(a && (!r._d||r._d.getFullYear()!=a)) return false;
+    if(mes && (!r._d||(r._d.getMonth()+1)!=mes)) return false;
+    if(se && lower(val(r,F.setor))!==se) return false;
+    if(st && lower(val(r,F.status))!==st) return false;
+    if(tag && !(lower(val(r,F.tag)).includes(tag)||lower(val(r,F.equip)).includes(tag))) return false;
+    return true;
+  });
+}
+
+// ── KPIs ──
+function calcKpis(rows){
+  const total=rows.length;
+  const conc=rows.filter(r=>lower(val(r,F.status)).includes('conclu')).length;
+  const horas=rows.reduce((a,r)=>a+r._h,0);
+  const comHoras=rows.filter(r=>r._h>0).length;
+  const mttr=comHoras?horas/comHoras:0;
+  const disp=Math.max(0,Math.min(100,(1-horas/720)*100));
+  const equip=new Set(rows.map(r=>String(val(r,F.equip)).trim()).filter(Boolean)).size;
+  const tec=new Set(rows.map(r=>String(val(r,F.tec)).trim()).filter(Boolean)).size;
+  return {total,conc,pend:total-conc,horas,mttr,disp,equip,tec};
+}
+function renderKpis(k){
+  const cards=[
+    {v:k.total,k:'OS Totais',c:'var(--blue)'},
+    {v:k.conc,k:'Concluídas',c:'var(--green)'},
+    {v:k.pend,k:'Pendentes',c:'var(--amber)'},
+    {v:k.horas.toFixed(1),u:'h',k:'Horas Paradas',c:'var(--red)'},
+    {v:k.mttr.toFixed(2),u:'h',k:'MTTR (méd.)',c:'var(--red)'},
+    {v:k.disp.toFixed(1),u:'%',k:'Disponib.',c:'var(--green)'},
+    {v:k.equip,k:'Equipamentos',c:'var(--blue)'},
+    {v:k.tec,k:'Técnicos',c:'var(--blue)'},
+  ];
+  kpis.innerHTML=cards.map(c=>`<div class="kpi" style="--c:${c.c}"><div class="v">${c.v}${c.u?` <span class="u">${c.u}</span>`:''}</div><div class="k">${c.k}</div></div>`).join('');
+}
+
+// ── Gráficos ──
+let charts={};
+const C={red:'#d4232a',blue:'#1f3a8f',green:'#15924c',amber:'#d68a12',gray:'#9aa4b2',purple:'#7a5cc8'};
+function mk(id,cfg){ if(charts[id])charts[id].destroy(); charts[id]=new Chart(document.getElementById(id),cfg); }
+function baseOpt(axis){return{responsive:true,maintainAspectRatio:false,indexAxis:axis||'x',
+  plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:'#eef1f6'}}}};}
+function donutOpt(){return{responsive:true,maintainAspectRatio:false,cutout:'62%',
+  plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}}};}
+function topN(rows,key,n,sumHoras){
+  const map={};
+  rows.forEach(r=>{const v=String(val(r,key)).trim();if(!v)return;map[v]=(map[v]||0)+(sumHoras?r._h:1);});
+  return Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,n);
+}
+function renderCharts(rows){
+  const byMes={},horasMes={};
+  rows.forEach(r=>{if(r._d){const k=`${r._d.getFullYear()}-${String(r._d.getMonth()+1).padStart(2,'0')}`;
+    byMes[k]=(byMes[k]||0)+1; horasMes[k]=(horasMes[k]||0)+r._h;}});
+  const mk_=Object.keys(byMes).sort();
+  mk('chMes',{type:'bar',data:{labels:mk_,datasets:[{data:mk_.map(k=>byMes[k]),backgroundColor:C.blue,borderRadius:5}]},options:baseOpt()});
+  mk('chHoras',{type:'line',data:{labels:mk_,datasets:[{data:mk_.map(k=>+horasMes[k].toFixed(1)),borderColor:C.red,backgroundColor:'rgba(212,35,42,.12)',fill:true,tension:.3,pointRadius:3}]},options:baseOpt()});
+
+  const stMap={};
+  rows.forEach(r=>{const s=String(val(r,F.status)).trim()||'(sem)';stMap[s]=(stMap[s]||0)+1;});
+  const sk=Object.keys(stMap);
+  mk('chStatus',{type:'doughnut',data:{labels:sk,datasets:[{data:sk.map(k=>stMap[k]),
+    backgroundColor:sk.map(s=>lower(s).includes('conclu')?C.green:lower(s).includes('pend')?C.amber:C.gray)}]},options:donutOpt()});
+
+  const eq=topN(rows,F.equip,10,false);
+  mk('chEquip',{type:'bar',data:{labels:eq.map(e=>e[0]),datasets:[{data:eq.map(e=>e[1]),backgroundColor:C.red,borderRadius:5}]},options:baseOpt('y')});
+
+  const mo=topN(rows,F.motivo,8,false);
+  mk('chMotivo',{type:'bar',data:{labels:mo.map(e=>e[0]),datasets:[{data:mo.map(e=>e[1]),backgroundColor:C.purple,borderRadius:5}]},options:baseOpt('y')});
+
+  const se=topN(rows,F.setor,8,true);
+  mk('chSetor',{type:'bar',data:{labels:se.map(e=>e[0]),datasets:[{data:se.map(e=>+e[1].toFixed(1)),backgroundColor:C.amber,borderRadius:5}]},options:baseOpt('y')});
+}
+
+// ── Tabela ──
+const COLS=[
+  {k:F.data,t:'Data'},{k:F.tag,t:'Código'},{k:F.equip,t:'Equipamento'},{k:F.setor,t:'Setor'},
+  {k:F.tec,t:'Técnico'},{k:F.horas,t:'Horas'},{k:F.motivo,t:'Motivo'},{k:F.solucao,t:'Solução'},{k:F.status,t:'Status'},
+].filter(c=>c.k);
+let sortCol=null,sortAsc=true;
+function renderTable(rows){
+  thead.innerHTML=COLS.map((c,i)=>`<th data-i="${i}">${c.t}</th>`).join('');
+  const busca=lower(elBusca.value);
+  let data=rows.filter(r=>!busca||COLS.some(c=>lower(val(r,c.k)).includes(busca)));
+  if(sortCol!=null){const k=COLS[sortCol].k;data=[...data].sort((a,b)=>{
+    let x=val(a,k),y=val(b,k); if(k===F.horas){x=num(x);y=num(y);}else{x=lower(x);y=lower(y);}
+    return(x>y?1:x<y?-1:0)*(sortAsc?1:-1);});}
+  const show=data.slice(0,300);
+  tbody.innerHTML=show.map(r=>`<tr>${COLS.map(c=>{
+    let v=val(r,c.k),cell=v;
+    if(c.k===F.data&&r._d)cell=r._d.toLocaleDateString('pt-BR');
+    else if(c.k===F.status){const s=lower(v);cell=`<span class="badge ${s.includes('conclu')?'b-ok':'b-open'}">${v||'—'}</span>`;}
+    else if(c.k===F.tag)cell=`<span class="tag-pill">${v||'—'}</span>`;
+    else if(c.k===F.horas)cell=v!==''?num(v).toFixed(1)+' h':'—';
+    else cell=v===''?'—':v;
+    return `<td>${cell}</td>`;}).join('')}</tr>`).join('');
+  tblInfo.textContent=`Mostrando ${show.length} de ${data.length} OS filtradas.`+(data.length>300?' (limite de 300 linhas na tela)':'');
+}
+
+function update(){
+  const rows=filtrar();
+  totalInfo.textContent=`${rows.length} OS no filtro atual`;
+  renderKpis(calcKpis(rows));
+  renderCharts(rows);
+  renderTable(rows);
+}
+[elAno,elMes,elSetor,elStatus].forEach(e=>e.addEventListener('change',update));
+elTag.addEventListener('input',update);
+elBusca.addEventListener('input',()=>renderTable(filtrar()));
+thead.addEventListener('click',e=>{const th=e.target.closest('th');if(!th)return;const i=+th.dataset.i;
+  if(sortCol===i)sortAsc=!sortAsc;else{sortCol=i;sortAsc=true;}renderTable(filtrar());});
+
+if(!RECORDS.length){content.style.display='none';empty.style.display='block';}else{update();}
+</script>
+</body>
+</html>

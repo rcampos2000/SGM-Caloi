@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard · KPIs de Manutenção — SGM Caloi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root{--red:#d4232a;--blue:#1f3a8f;--ink:#1d2430;--muted:#6b7686;--line:#e6e9ef;--bg:#f3f5f9;
+    --card:#fff;--green:#21a35a;--yellow:#e8b53a;--red2:#e23b2e;--gray:#cfd6de;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;}
+  a{text-decoration:none;color:inherit;}
+  .topbar{background:#fff;border-bottom:3px solid var(--gold,#c8a84b);padding:14px 28px;display:flex;
+    align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,.05);border-bottom-color:#c8a84b;}
+  .topbar h1{font-family:'Oswald',sans-serif;font-weight:700;font-size:20px;letter-spacing:1px;
+    text-transform:uppercase;display:flex;align-items:center;gap:10px;}
+  .topbar h1 .ico{color:#c8a84b;font-size:22px;}
+  .top-actions{display:flex;gap:10px;align-items:center;}
+  .btn{border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:.2s;}
+  .btn-tpm{background:#c8a84b;color:#fff;} .btn-tpm:hover{filter:brightness(.93);}
+  .btn-ghost{background:#eef1f6;color:var(--ink);} .btn-ghost:hover{background:#e2e7f0;}
+  .wrap{max-width:1240px;margin:0 auto;padding:22px 28px 50px;}
+  .filters{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 16px;display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-bottom:22px;}
+  .field{display:flex;flex-direction:column;gap:4px;}
+  .field label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:600;}
+  .field select{border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit;color:var(--ink);background:#fff;min-width:140px;}
+  .spacer{flex:1;}
+  .updated{font-size:11px;color:var(--muted);text-align:right;} .updated b{color:var(--green);}
+  /* grade tipo painel */
+  .board{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:stretch;}
+  .gcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 10px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+  .gcard h3{font-family:'Oswald',sans-serif;font-size:15px;letter-spacing:.5px;text-transform:uppercase;color:var(--ink);margin-bottom:2px;}
+  .gcard .sub{font-size:10px;color:var(--muted);margin-bottom:4px;}
+  .gauge-val{font-family:'Oswald',sans-serif;font-size:26px;font-weight:700;margin-top:-6px;}
+  .gauge-val small{font-size:13px;color:var(--muted);font-weight:600;}
+  .center{grid-row:span 2;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .center h3{font-family:'Oswald',sans-serif;font-size:16px;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+  .donut-box{position:relative;width:240px;height:240px;}
+  .donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;}
+  .donut-center .big{font-family:'Oswald',sans-serif;font-size:34px;font-weight:700;color:var(--green);}
+  .donut-center .lbl{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);}
+  .legend{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;margin-top:14px;font-size:11px;color:var(--muted);}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:middle;}
+  .nodata{color:var(--muted);font-size:11px;font-weight:600;background:#f1f3f7;border-radius:99px;padding:2px 10px;display:inline-block;margin-top:2px;}
+  @media(max-width:900px){.board{grid-template-columns:1fr 1fr;} .center{grid-row:auto;grid-column:span 2;}}
+  @media(max-width:620px){.board{grid-template-columns:1fr;} .center{grid-column:auto;}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <h1><span class="ico">📊</span> Dashboard · KPIs de Manutenção</h1>
+  <div class="top-actions">
+    <a class="btn btn-tpm" href="{{ tpm_url or '#' }}" target="_blank" rel="noopener">➕ Abrir TPM</a>
+    <a class="btn btn-ghost" href="/portal">← Voltar à Capa</a>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="filters">
+    <div class="field"><label>Ano</label><select id="fAno"><option value="">Todos</option></select></div>
+    <div class="field"><label>Mês</label><select id="fMes"><option value="">Todos</option></select></div>
+    <div class="field"><label>Setor</label><select id="fSetor"><option value="">Todos</option></select></div>
+    <div class="spacer"></div>
+    <div class="updated">Fonte: OS do TPM · <b>online</b><br><span id="totalInfo"></span></div>
+  </div>
+
+  <div class="board">
+    <div class="gcard" id="g-mttr"></div>
+    <div class="gcard center">
+      <h3>Disponibilidade Geral</h3>
+      <div class="donut-box"><canvas id="donut"></canvas>
+        <div class="donut-center"><div class="big" id="donutBig">—</div><div class="lbl">Disponível</div></div>
+      </div>
+      <div class="legend">
+        <span><i style="background:var(--green)"></i>Disponível</span>
+        <span><i style="background:var(--red2)"></i>Parada</span>
+      </div>
+    </div>
+    <div class="gcard" id="g-mtbf"></div>
+    <div class="gcard" id="g-disp"></div>
+    <div class="gcard" id="g-oee"></div>
+    <div class="gcard" id="g-prev"></div>
+    <div class="gcard" id="g-fin"></div>
+  </div>
+  <p class="updated" style="text-align:left;margin-top:16px">
+    * OEE exibido de forma <b>parcial</b> (componente Disponibilidade). Performance e Qualidade exigem dados de produção.
+    Manutenção Preventiva e Administração Financeira aguardam integração de dados.
+  </p>
+</div>
+
+<script>
+const RECORDS = {{ records_json | tojson }};
+const KEYS = RECORDS.length ? Object.keys(RECORDS[0]) : [];
+function findKey(...c){for(const x of c){const k=KEYS.find(k=>k.toLowerCase().includes(x));if(k)return k;}return null;}
+const F={data:findKey('ocorr','data/hora','data'),setor:findKey('setor','área','area'),
+  horas:findKey('total horas','horas parad','horas','tempo'),status:findKey('status','situa')};
+function parseData(v){if(!v)return null;const s=String(v);
+  let m=s.match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);
+  m=s.match(/(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})/);if(m)return new Date(+m[3],+m[2]-1,+m[1]);
+  const d=new Date(s);return isNaN(d)?null:d;}
+function num(v){const n=parseFloat(String(v).replace(',','.'));return isNaN(n)?0:n;}
+function val(r,k){return k&&r[k]!=null?r[k]:'';}
+function lower(x){return String(x||'').toLowerCase();}
+RECORDS.forEach(r=>{r._d=parseData(val(r,F.data));r._h=num(val(r,F.horas));r._s=String(val(r,F.setor)).trim();});
+
+const anos=[...new Set(RECORDS.map(r=>r._d?r._d.getFullYear():null).filter(Boolean))].sort((a,b)=>b-a);
+const setores=[...new Set(RECORDS.map(r=>r._s).filter(Boolean))].sort();
+const MES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+anos.forEach(a=>fAno.add(new Option(a,a)));
+MES.forEach((m,i)=>fMes.add(new Option(m,i+1)));
+setores.forEach(s=>fSetor.add(new Option(s,s)));
+
+function filtrar(){const a=fAno.value,mes=fMes.value,se=lower(fSetor.value);
+  return RECORDS.filter(r=>{
+    if(a&&(!r._d||r._d.getFullYear()!=a))return false;
+    if(mes&&(!r._d||(r._d.getMonth()+1)!=mes))return false;
+    if(se&&lower(r._s)!==se)return false;return true;});}
+
+// número de meses no recorte (para janela de horas disponíveis)
+function janelaHoras(rows){
+  const meses=new Set(rows.map(r=>r._d?`${r._d.getFullYear()}-${r._d.getMonth()}`:null).filter(Boolean));
+  const n=Math.max(1,meses.size);
+  return n*720; // ~720h/mês
+}
+
+// ── Medidor (gauge velocímetro 270°) ──
+const COL={green:'#21a35a',yellow:'#e8b53a',red:'#e23b2e',gray:'#cfd6de'};
+function pol(cx,cy,r,frac){const a=(135+frac*270)*Math.PI/180;return [cx+r*Math.cos(a),cy+r*Math.sin(a)];}
+function arc(cx,cy,r,f0,f1){const [x0,y0]=pol(cx,cy,r,f0),[x1,y1]=pol(cx,cy,r,f1);
+  const large=(f1-f0)*270>180?1:0;return `M ${x0.toFixed(1)} ${y0.toFixed(1)} A ${r} ${r} 0 ${large} 1 ${x1.toFixed(1)} ${y1.toFixed(1)}`;}
+function gauge(cfg){
+  // cfg: {titulo,sub,valor,max,unidade,dir,zonas:[a,b],semdados}
+  const cx=110,cy=110,r=84;
+  const f = cfg.semdados?0:Math.max(0,Math.min(1,(cfg.valor||0)/cfg.max));
+  const [za,zb]=cfg.zonas||[0.4,0.75];
+  let zonas;
+  if(cfg.dir==='low') zonas=[[0,za,COL.green],[za,zb,COL.yellow],[zb,1,COL.red]];
+  else zonas=[[0,za,COL.red],[za,zb,COL.yellow],[zb,1,COL.green]];
+  if(cfg.semdados) zonas=[[0,1,COL.gray]];
+  // ticks
+  let ticks='';
+  for(let i=0;i<=10;i++){const ff=i/10;const [x1,y1]=pol(cx,cy,r+9,ff),[x2,y2]=pol(cx,cy,r+3,ff);
+    ticks+=`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#b9c2cc" stroke-width="${i%5===0?2:1}"/>`;}
+  const zonasSvg=zonas.map(z=>`<path d="${arc(cx,cy,r,z[0],z[1])}" fill="none" stroke="${z[2]}" stroke-width="16" stroke-linecap="butt"/>`).join('');
+  // ponteiro
+  const [nx,ny]=pol(cx,cy,r-12,f);
+  const needle=cfg.semdados?'':`<line x1="${cx}" y1="${cy}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="#1d2430" stroke-width="3" stroke-linecap="round"/><circle cx="${cx}" cy="${cy}" r="6" fill="#1d2430"/>`;
+  const valTxt = cfg.semdados ? '<span class="nodata">sem dados</span>'
+    : `<div class="gauge-val">${cfg.valorTxt!=null?cfg.valorTxt:(cfg.valor||0).toFixed(cfg.dec!=null?cfg.dec:1)} <small>${cfg.unidade||''}</small></div>`;
+  return `<h3>${cfg.titulo}</h3><div class="sub">${cfg.sub||''}</div>
+    <svg viewBox="0 0 220 200" style="width:100%;max-width:240px">
+      ${ticks}${zonasSvg}${needle}
+    </svg>${valTxt}`;
+}
+
+let donutChart=null;
+function update(){
+  const rows=filtrar();
+  totalInfo.textContent=`${rows.length} OS no filtro`;
+  const total=rows.length;
+  const somaH=rows.reduce((a,r)=>a+r._h,0);
+  const comH=rows.filter(r=>r._h>0).length;
+  const mttr=comH?somaH/comH:0;
+  const janela=janelaHoras(rows);
+  const mtbf=total?janela/total:0;
+  const disp=Math.max(0,Math.min(100,(1-somaH/janela)*100));
+  const oee=disp; // parcial (só disponibilidade)
+
+  document.getElementById('g-mttr').innerHTML=gauge({titulo:'MTTR',sub:'Tempo médio de reparo',valor:mttr,max:8,unidade:'h',dir:'low',zonas:[0.25,0.5],dec:2});
+  document.getElementById('g-mtbf').innerHTML=gauge({titulo:'MTBF',sub:'Tempo entre falhas',valor:mtbf,max:720,unidade:'h',dir:'high',zonas:[0.23,0.5],dec:0});
+  document.getElementById('g-disp').innerHTML=gauge({titulo:'Disponibilidade',sub:'de máquina',valor:disp,max:100,unidade:'%',dir:'high',zonas:[0.75,0.9],dec:1});
+  document.getElementById('g-oee').innerHTML=gauge({titulo:'OEE *',sub:'parcial (disponibilidade)',valor:oee,max:100,unidade:'%',dir:'high',zonas:[0.6,0.85],dec:1});
+  document.getElementById('g-prev').innerHTML=gauge({titulo:'Manutenção Preventiva',sub:'aguardando dados',semdados:true});
+  document.getElementById('g-fin').innerHTML=gauge({titulo:'Administração Financeira',sub:'aguardando dados',semdados:true});
+
+  // donut disponibilidade
+  const parada=Math.min(100,100-disp);
+  document.getElementById('donutBig').textContent=disp.toFixed(1)+'%';
+  const ctx=document.getElementById('donut');
+  if(donutChart)donutChart.destroy();
+  donutChart=new Chart(ctx,{type:'doughnut',data:{labels:['Disponível','Parada'],
+    datasets:[{data:[+disp.toFixed(1),+parada.toFixed(1)],backgroundColor:[COL.green,COL.red],borderWidth:0}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:false},
+      tooltip:{callbacks:{label:c=>c.label+': '+c.raw+'%'}}}}});
+}
+[fAno,fMes,fSetor].forEach(e=>e.addEventListener('change',update));
+update();
+</script>
+</body>
+</html>
