@@ -67,12 +67,16 @@ SGM_API_KEY = os.environ.get("SGM_API_KEY", "caloi-sgm-2026")  # deve ser igual 
 def hash_senha(s):
     return hashlib.sha256(s.encode()).hexdigest()
 
+# Senha do admin vem de variável de ambiente (defina ADMIN_PASSWORD no Railway).
+# Em dev/local, cai no padrão "admin123".
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
+
 USUARIOS_PADRAO = [
-    {"id":"1","username":"admin","password_hash":hash_senha("admin123"),
+    {"id":"1","username":"admin","password_hash":hash_senha(ADMIN_PASSWORD),
      "nome":"Administrador","perfil":"admin","ativo":True},
-    {"id":"2","username":"gerente","password_hash":hash_senha("ger123"),
+    {"id":"2","username":"gerente","password_hash":hash_senha(os.environ.get("GERENTE_PASSWORD","ger123")),
      "nome":"Gerente","perfil":"gerente","ativo":True},
-    {"id":"3","username":"viewer","password_hash":hash_senha("view123"),
+    {"id":"3","username":"viewer","password_hash":hash_senha(os.environ.get("VIEWER_PASSWORD","view123")),
      "nome":"Visualizador","perfil":"viewer","ativo":True},
 ]
 

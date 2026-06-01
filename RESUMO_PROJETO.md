@@ -5,6 +5,23 @@
 
 ---
 
+## 🚀 PRODUÇÃO — NO AR (Railway)
+- **SGM (portal/dashboards):** https://web-production-e43ec.up.railway.app  → login `admin` / `admin123`
+- **TPM (registro de OS + API):** https://web-production-97918.up.railway.app
+- **Integração:** o SGM lê os dados do TPM via API `GET /api/dados/os|plano|colaboradores?key=...`
+  - Local (PC): lê o Excel direto da pasta irmã do TPM.
+  - Nuvem (Railway): usa a API do TPM (`TPM_API_URL`, `SGM_API_KEY`).
+- **Repositórios GitHub:** `rcampos2000/SGM-Caloi` e `rcampos2000/caloi-tpm`
+- **Portas locais:** TPM 5000 · SGM 5001.
+
+### Pendências de segurança/acabamento
+- Trocar a senha do `admin` em produção.
+- Definir `SECRET_KEY` próprio no SGM (hoje usa o padrão do código).
+- (Opcional) `SGM_API_KEY` forte nos dois serviços (hoje no padrão `caloi-sgm-2026`).
+- **Revogar** o token do GitHub antigo que ficou exposto.
+
+---
+
 ## 📁 Pastas (na Área de Trabalho)
 - **SGM_Caloi** → este projeto (portal/dashboards). Caminho:
   `C:\Users\campo\OneDrive\Área de Trabalho\SGM_Caloi`
