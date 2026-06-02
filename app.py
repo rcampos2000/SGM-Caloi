@@ -312,11 +312,13 @@ def fotos(fn):
 @login_required
 def mod_ordens():
     rows = carregar_dataset("os", TPM_OS_FILE)
+    plano = carregar_dataset("plano", TPM_PLANO)
     kpis = calcular_kpis_tpm(rows)
     anos = sorted({str(r.get("Data",""))[:4] for r in rows if r.get("Data") and str(r.get("Data",""))[:4].isdigit()}, reverse=True)
     return render_template("modulos/ordens.html",
-                           kpis=kpis, records_json=serializar_rows(rows), anos=anos,
-                           tpm_url=TPM_URL)
+                           kpis=kpis, records_json=serializar_rows(rows),
+                           plano_json=serializar_rows(plano),
+                           anos=anos, tpm_url=TPM_URL)
 
 @app.route("/modulo/plano-acao")
 @login_required

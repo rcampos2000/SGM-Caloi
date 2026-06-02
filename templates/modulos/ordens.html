@@ -27,7 +27,7 @@
     display:inline-flex;align-items:center;gap:7px;transition:.2s;}
   .btn-tpm{background:var(--red);color:#fff;} .btn-tpm:hover{background:var(--red-d);}
   .btn-ghost{background:#eef1f6;color:var(--ink);} .btn-ghost:hover{background:#e2e7f0;}
-  .wrap{max-width:1280px;margin:0 auto;padding:22px 28px 50px;}
+  .wrap{max-width:1400px;margin:0 auto;padding:22px 28px 50px;}
   .filters{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;
     display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-bottom:20px;}
   .field{display:flex;flex-direction:column;gap:4px;}
@@ -49,9 +49,10 @@
   .panel h3{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:700;
     margin-bottom:12px;display:flex;align-items:center;gap:8px;}
   .panel h3 .dot{width:8px;height:8px;border-radius:50%;background:var(--red);}
-  .c-8{grid-column:span 8;} .c-6{grid-column:span 6;} .c-4{grid-column:span 4;} .c-12{grid-column:span 12;}
-  .chart-box{position:relative;height:280px;} .chart-box.sm{height:250px;}
-  @media(max-width:920px){.c-8,.c-6,.c-4{grid-column:span 12;}}
+  .c-8{grid-column:span 8;} .c-7{grid-column:span 7;} .c-6{grid-column:span 6;}
+  .c-5{grid-column:span 5;} .c-4{grid-column:span 4;} .c-3{grid-column:span 3;} .c-12{grid-column:span 12;}
+  .chart-box{position:relative;height:280px;} .chart-box.sm{height:250px;} .chart-box.md{height:265px;}
+  @media(max-width:920px){.c-8,.c-7,.c-6,.c-5,.c-4,.c-3{grid-column:span 12;}}
   .table-tools{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:24px 0 10px;flex-wrap:wrap;}
   .table-tools h2{font-family:'Oswald',sans-serif;font-size:18px;letter-spacing:.5px;text-transform:uppercase;}
   table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:13px;}
@@ -61,9 +62,38 @@
   tbody tr:hover{background:#fafbfe;}
   .tag-pill{font-family:'Oswald',sans-serif;font-weight:600;color:var(--blue);}
   .badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;text-transform:uppercase;letter-spacing:.5px;}
-  .b-ok{background:#e8f4ec;color:var(--green);} .b-open{background:#fdf3e3;color:var(--amber);}
+  .b-ok{background:#e8f4ec;color:var(--green);} .b-open{background:#fdecea;color:var(--red);}
   .empty{background:#fff;border:1px dashed var(--line);border-radius:12px;padding:50px;text-align:center;color:var(--muted);}
   .muted{color:var(--muted);font-size:12px;}
+
+  /* ── Flag de OS Aberta ── */
+  .flag-info{font-size:11px;color:var(--muted);margin-top:6px;display:flex;flex-wrap:wrap;gap:6px;}
+  .flag-item{display:inline-flex;align-items:center;gap:4px;background:#fdecea;color:var(--red);
+    border:1px solid rgba(212,35,42,.25);border-radius:6px;padding:2px 8px;font-weight:600;font-size:11px;}
+  .flag-item::before{content:'🔴';font-size:10px;}
+
+  /* ── Modal Drill-down ── */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;
+    align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto;}
+  .modal-overlay.open{display:flex;}
+  .modal-box{background:#fff;border-radius:16px;width:100%;max-width:1100px;
+    box-shadow:0 20px 60px rgba(0,0,0,.25);overflow:hidden;margin:auto;}
+  .modal-head{background:var(--blue);color:#fff;padding:18px 24px;display:flex;
+    justify-content:space-between;align-items:center;}
+  .modal-head h2{font-family:'Oswald',sans-serif;font-size:18px;letter-spacing:.5px;}
+  .modal-head .sub{font-size:12px;opacity:.8;margin-top:3px;}
+  .modal-close{background:rgba(255,255,255,.2);border:none;color:#fff;width:32px;height:32px;
+    border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .modal-close:hover{background:rgba(255,255,255,.35);}
+  .modal-body{padding:20px 24px;overflow-x:auto;max-height:70vh;overflow-y:auto;}
+  .modal-table{width:100%;border-collapse:collapse;font-size:12px;}
+  .modal-table th{background:#f0f4ff;padding:9px 10px;text-align:left;font-size:10px;
+    letter-spacing:.5px;text-transform:uppercase;color:var(--blue);border-bottom:2px solid var(--line);white-space:nowrap;}
+  .modal-table td{padding:9px 10px;border-bottom:1px solid #f1f3f7;vertical-align:top;max-width:220px;word-break:break-word;}
+  .modal-table tr:hover td{background:#fafbfe;}
+  .modal-table .badge{font-size:10px;}
+  .foto-badge{display:inline-flex;align-items:center;gap:4px;background:#e8f0fe;color:var(--blue);
+    border-radius:6px;padding:2px 8px;font-size:11px;font-weight:600;}
 </style>
 </head>
 <body>
@@ -72,6 +102,31 @@
   <div class="top-actions">
     <a class="btn btn-tpm" href="{{ tpm_url or '#' }}" target="_blank" rel="noopener">➕ Registrar OS (TPM)</a>
     <a class="btn btn-ghost" href="/portal">← Voltar à Capa</a>
+  </div>
+</div>
+
+<!-- Modal Drill-down Equipamento -->
+<div class="modal-overlay" id="modalEquip" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div>
+        <h2 id="modalTitle">Histórico do Equipamento</h2>
+        <div class="sub" id="modalSub"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <table class="modal-table">
+        <thead>
+          <tr>
+            <th>Data</th><th>Técnico</th><th>Horas</th><th>Motivo / Tipo</th>
+            <th>Status</th><th>Fotos</th><th>Solução / Descrição</th>
+            <th>Observações</th><th>Outros Problemas</th><th>Peças Necessárias</th>
+          </tr>
+        </thead>
+        <tbody id="modalTbody"></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
@@ -91,10 +146,19 @@
     <div class="grid">
       <div class="panel c-8"><h3><span class="dot"></span>Paradas por mês</h3><div class="chart-box"><canvas id="chMes"></canvas></div></div>
       <div class="panel c-4"><h3><span class="dot"></span>Status</h3><div class="chart-box sm"><canvas id="chStatus"></canvas></div></div>
-      <div class="panel c-6"><h3><span class="dot"></span>Top equipamentos (nº de paradas)</h3><div class="chart-box"><canvas id="chEquip"></canvas></div></div>
+
+      <div class="panel c-6">
+        <h3><span class="dot"></span>Top equipamentos · clique para ver histórico</h3>
+        <div id="flagsArea" class="flag-info" style="margin-bottom:8px;"></div>
+        <div class="chart-box"><canvas id="chEquip" style="cursor:pointer;"></canvas></div>
+      </div>
       <div class="panel c-6"><h3><span class="dot"></span>Principais motivos de parada</h3><div class="chart-box"><canvas id="chMotivo"></canvas></div></div>
+
       <div class="panel c-8"><h3><span class="dot"></span>Horas paradas por mês</h3><div class="chart-box sm"><canvas id="chHoras"></canvas></div></div>
       <div class="panel c-4"><h3><span class="dot"></span>Horas paradas por setor</h3><div class="chart-box sm"><canvas id="chSetor"></canvas></div></div>
+
+      <div class="panel c-6"><h3><span class="dot"></span>Horas paradas por técnico</h3><div class="chart-box md"><canvas id="chTecHoras"></canvas></div></div>
+      <div class="panel c-6"><h3><span class="dot"></span>Status dos técnicos agora</h3><div class="chart-box md"><canvas id="chTecDisp"></canvas></div></div>
     </div>
 
     <div class="table-tools">
@@ -115,26 +179,40 @@
 
 <script>
 const RECORDS = {{ records_json | tojson }};
+const PLANO   = {{ plano_json | tojson }};
 
-// ── Detecção das colunas (esquema real do TPM, com tolerância) ──
+// ── Detecção de colunas ──
 const KEYS = RECORDS.length ? Object.keys(RECORDS[0]) : [];
 function findKey(...cands){
-  for(const c of cands){ const k = KEYS.find(k=>k.toLowerCase().includes(c)); if(k) return k; }
+  for(const c of cands){ const k=KEYS.find(k=>k.toLowerCase().includes(c)); if(k) return k; }
   return null;
 }
 const F = {
-  data:   findKey('ocorr','data/hora','data'),
-  tag:    findKey('código','codigo','cód','tag'),
-  equip:  findKey('equipamento','máquina','maquina'),
-  tec:    findKey('técnic','tecnic','respons'),
-  setor:  findKey('setor','área','area'),
-  horas:  findKey('total horas','horas parad','horas','tempo','duração','duracao'),
-  motivo: findKey('motivo'),
-  solucao:findKey('solução','solucao','solução do'),
-  status: findKey('status','situa'),
-  parada: findKey('horário de parada','hora parada'),
-  lib:    findKey('horário de liber','hora liber'),
+  data:    findKey('ocorr','data/hora','data'),
+  tag:     findKey('código','codigo','cód','tag'),
+  equip:   findKey('equipamento','máquina','maquina'),
+  tec:     findKey('técnic','tecnic','respons'),
+  setor:   findKey('setor','área','area'),
+  horas:   findKey('total horas','horas parad','horas','tempo','duração','duracao'),
+  motivo:  findKey('motivo'),
+  solucao: findKey('solução','solucao','solução do'),
+  obs:     findKey('observa'),
+  status:  findKey('status','situa'),
+  parada:  findKey('horário de parada','hora parada'),
+  lib:     findKey('horário de liber','hora liber'),
+  fotos:   findKey('fotos registradas','fotos'),
+  mat:     findKey('materiais'),
 };
+const PK = (() => {
+  const pk = PLANO.length ? Object.keys(PLANO[0]) : [];
+  function fp(...c){ for(const x of c){ const k=pk.find(k=>k.toLowerCase().includes(x)); if(k) return k; } return null; }
+  return {
+    equip:  fp('equipamento','máquina','maquina'),
+    outros: fp('outros'),
+    pecas:  fp('peça','peca'),
+    id:     fp('id registro','id'),
+  };
+})();
 
 function parseData(v){
   if(!v) return null;
@@ -149,6 +227,13 @@ function num(v){ const n=parseFloat(String(v).replace(',','.')); return isNaN(n)
 function val(r,k){ return k && r[k]!=null ? r[k] : ''; }
 function lower(x){ return String(x||'').toLowerCase(); }
 RECORDS.forEach(r=>{ r._d=parseData(val(r,F.data)); r._h=num(val(r,F.horas)); });
+
+// ── Técnicos com OS aberta (Pendente) ──
+function getTecAbertos(){
+  const abertos=new Set();
+  RECORDS.forEach(r=>{ if(lower(val(r,F.status)).includes('pend')) abertos.add(String(val(r,F.tec)).trim()); });
+  return abertos;
+}
 
 // ── Filtros ──
 const anos=[...new Set(RECORDS.map(r=>r._d?r._d.getFullYear():null).filter(Boolean))].sort((a,b)=>b-a);
@@ -212,7 +297,9 @@ function topN(rows,key,n,sumHoras){
   rows.forEach(r=>{const v=String(val(r,key)).trim();if(!v)return;map[v]=(map[v]||0)+(sumHoras?r._h:1);});
   return Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,n);
 }
+
 function renderCharts(rows){
+  // Paradas / Horas por mês
   const byMes={},horasMes={};
   rows.forEach(r=>{if(r._d){const k=`${r._d.getFullYear()}-${String(r._d.getMonth()+1).padStart(2,'0')}`;
     byMes[k]=(byMes[k]||0)+1; horasMes[k]=(horasMes[k]||0)+r._h;}});
@@ -220,23 +307,116 @@ function renderCharts(rows){
   mk('chMes',{type:'bar',data:{labels:mk_,datasets:[{data:mk_.map(k=>byMes[k]),backgroundColor:C.blue,borderRadius:5}]},options:baseOpt()});
   mk('chHoras',{type:'line',data:{labels:mk_,datasets:[{data:mk_.map(k=>+horasMes[k].toFixed(1)),borderColor:C.red,backgroundColor:'rgba(212,35,42,.12)',fill:true,tension:.3,pointRadius:3}]},options:baseOpt()});
 
+  // Status
   const stMap={};
   rows.forEach(r=>{const s=String(val(r,F.status)).trim()||'(sem)';stMap[s]=(stMap[s]||0)+1;});
   const sk=Object.keys(stMap);
   mk('chStatus',{type:'doughnut',data:{labels:sk,datasets:[{data:sk.map(k=>stMap[k]),
     backgroundColor:sk.map(s=>lower(s).includes('conclu')?C.green:lower(s).includes('pend')?C.amber:C.gray)}]},options:donutOpt()});
 
+  // Top 10 Equipamentos — cores: vermelho se tem OS pendente
   const eq=topN(rows,F.equip,10,false);
-  mk('chEquip',{type:'bar',data:{labels:eq.map(e=>e[0]),datasets:[{data:eq.map(e=>e[1]),backgroundColor:C.red,borderRadius:5}]},options:baseOpt('y')});
+  const equipComPendente=new Set();
+  rows.filter(r=>lower(val(r,F.status)).includes('pend')).forEach(r=>equipComPendente.add(String(val(r,F.equip)).trim()));
+  const equipColors=eq.map(e=>equipComPendente.has(e[0])?C.red:'#1f3a8f');
 
+  // Flags de OS aberta abaixo do título
+  const tecPorEquip={};
+  rows.filter(r=>lower(val(r,F.status)).includes('pend')).forEach(r=>{
+    const e=String(val(r,F.equip)).trim(); const t=String(val(r,F.tec)).trim();
+    if(!e) return;
+    if(!tecPorEquip[e]) tecPorEquip[e]=new Set();
+    tecPorEquip[e].add(t);
+  });
+  const flagsArea=document.getElementById('flagsArea');
+  const flagEquips=eq.filter(e=>equipComPendente.has(e[0]));
+  flagsArea.innerHTML=flagEquips.map(e=>{
+    const tecs=[...tecPorEquip[e[0]]||[]].join(', ');
+    return `<span class="flag-item">${e[0]}${tecs?' — '+tecs:''}</span>`;
+  }).join('');
+
+  mk('chEquip',{type:'bar',data:{labels:eq.map(e=>e[0]),datasets:[{data:eq.map(e=>e[1]),backgroundColor:equipColors,borderRadius:5}]},
+    options:{...baseOpt('y'),onClick:(evt,els)=>{if(els.length){const name=eq[els[0].index][0];openEquipModal(name,rows);}}}});
+
+  // Motivos / Setor
   const mo=topN(rows,F.motivo,8,false);
   mk('chMotivo',{type:'bar',data:{labels:mo.map(e=>e[0]),datasets:[{data:mo.map(e=>e[1]),backgroundColor:C.purple,borderRadius:5}]},options:baseOpt('y')});
-
   const se=topN(rows,F.setor,8,true);
   mk('chSetor',{type:'bar',data:{labels:se.map(e=>e[0]),datasets:[{data:se.map(e=>+e[1].toFixed(1)),backgroundColor:C.amber,borderRadius:5}]},options:baseOpt('y')});
+
+  // Horas por técnico
+  const tecH=topN(rows,F.tec,12,true);
+  mk('chTecHoras',{type:'bar',data:{labels:tecH.map(e=>e[0]),datasets:[{data:tecH.map(e=>+e[1].toFixed(1)),backgroundColor:C.blue,borderRadius:5}]},options:baseOpt('y')});
+
+  // Status dos técnicos: disponível vs em atendimento
+  renderTecDisp(rows);
 }
 
-// ── Tabela ──
+function renderTecDisp(rows){
+  // Todos os técnicos que aparecem em RECORDS (global, não filtrado)
+  const allTecs=[...new Set(RECORDS.map(r=>String(val(r,F.tec)).trim()).filter(Boolean))].sort();
+  const emAtendimento=new Set();
+  RECORDS.filter(r=>lower(val(r,F.status)).includes('pend')).forEach(r=>emAtendimento.add(String(val(r,F.tec)).trim()));
+  const labels=allTecs;
+  const cores=labels.map(t=>emAtendimento.has(t)?C.red:C.green);
+  const valores=labels.map(()=>1);
+  mk('chTecDisp',{
+    type:'bar',
+    data:{labels,datasets:[{data:valores,backgroundColor:cores,borderRadius:6,barThickness:20}]},
+    options:{
+      responsive:true,maintainAspectRatio:false,indexAxis:'y',
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>{const t=labels[ctx.dataIndex]; return emAtendimento.has(t)?'🔴 Em Atendimento':'🟢 Disponível';}}}
+      },
+      scales:{
+        x:{display:false,max:1.5},
+        y:{grid:{display:false},ticks:{font:{size:12}}},
+      }
+    }
+  });
+}
+
+// ── Modal Drill-down ──
+function openEquipModal(equipName, rows){
+  const filtered=rows.filter(r=>String(val(r,F.equip)).trim()===equipName).sort((a,b)=>(b._d||0)-(a._d||0));
+  const planoMap={};
+  PLANO.forEach(p=>{ const e=String(val(p,PK.equip)||'').trim().toLowerCase(); if(!planoMap[e]) planoMap[e]=[]; planoMap[e].push(p); });
+  const planoEquip=planoMap[equipName.toLowerCase()]||[];
+
+  document.getElementById('modalTitle').textContent='📋 '+equipName;
+  document.getElementById('modalSub').textContent=`${filtered.length} OS registradas`;
+
+  const rows_=filtered.map((r,i)=>{
+    const plRow=planoEquip[i]||planoEquip[0]||null;
+    const isPend=lower(val(r,F.status)).includes('pend');
+    const statusBadge=`<span class="badge ${isPend?'b-open':'b-ok'}">${val(r,F.status)||'—'}</span>`;
+    const fotos=num(val(r,F.fotos));
+    const fotoBadge=fotos>0?`<span class="foto-badge">📷 ${fotos}</span>`:'—';
+    const outros=plRow?String(val(plRow,PK.outros)||'').trim()||'—':'—';
+    const pecas=plRow?String(val(plRow,PK.pecas)||'').trim()||'—':'—';
+    const data=r._d?r._d.toLocaleDateString('pt-BR'):String(val(r,F.data)||'—');
+    return `<tr>
+      <td>${data}</td>
+      <td>${val(r,F.tec)||'—'}</td>
+      <td>${r._h>0?r._h.toFixed(1)+' h':'—'}</td>
+      <td>${val(r,F.motivo)||'—'}</td>
+      <td>${statusBadge}</td>
+      <td>${fotoBadge}</td>
+      <td>${val(r,F.solucao)||'—'}</td>
+      <td>${val(r,F.obs)||'—'}</td>
+      <td>${outros}</td>
+      <td>${pecas}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('modalTbody').innerHTML=rows_||'<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:30px;">Sem registros</td></tr>';
+  document.getElementById('modalEquip').classList.add('open');
+}
+function closeModal(){document.getElementById('modalEquip').classList.remove('open');}
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+
+// ── Tabela principal ──
 const COLS=[
   {k:F.data,t:'Data'},{k:F.tag,t:'Código'},{k:F.equip,t:'Equipamento'},{k:F.setor,t:'Setor'},
   {k:F.tec,t:'Técnico'},{k:F.horas,t:'Horas'},{k:F.motivo,t:'Motivo'},{k:F.solucao,t:'Solução'},{k:F.status,t:'Status'},

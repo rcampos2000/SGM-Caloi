@@ -5,8 +5,8 @@
 
 ---
 
-## 🚀 PRODUÇÃO — NO AR (Railway)
-- **SGM (portal/dashboards):** https://web-production-e43ec.up.railway.app  → login `admin` / `admin123`
+## 🚀 PRODUÇÃO — NO AR (Railway) · projeto "amused-fascination"
+- **SGM (portal/dashboards):** https://sgm-caloi-production.up.railway.app  → login `admin` / **(senha definida via env `ADMIN_PASSWORD`)**
 - **TPM (registro de OS + API):** https://web-production-97918.up.railway.app
 - **Integração:** o SGM lê os dados do TPM via API `GET /api/dados/os|plano|colaboradores?key=...`
   - Local (PC): lê o Excel direto da pasta irmã do TPM.
@@ -14,11 +14,16 @@
 - **Repositórios GitHub:** `rcampos2000/SGM-Caloi` e `rcampos2000/caloi-tpm`
 - **Portas locais:** TPM 5000 · SGM 5001.
 
-### Pendências de segurança/acabamento
-- Trocar a senha do `admin` em produção.
-- Definir `SECRET_KEY` próprio no SGM (hoje usa o padrão do código).
-- (Opcional) `SGM_API_KEY` forte nos dois serviços (hoje no padrão `caloi-sgm-2026`).
-- **Revogar** o token do GitHub antigo que ficou exposto.
+### Segurança (feito ✅)
+- Senha do admin trocada via env `ADMIN_PASSWORD` (o `admin123` não funciona mais).
+- `SGM_API_KEY` **forte** configurada nos DOIS serviços (TPM e SGM) — a chave antiga é rejeitada (401).
+- Tokens do GitHub antigos **revogados**.
+- Projeto Railway duplicado ("reasonable-miracle") removido.
+
+### Variáveis no Railway
+- **TPM (serviço web):** `DATA_DIR=/data` (+ volume), `SECRET_KEY`, `SGM_API_KEY`.
+- **SGM (serviço SGM-Caloi):** `SECRET_KEY`, `SGM_API_KEY` (igual à do TPM), `ADMIN_PASSWORD`. (`TPM_API_URL`/`TPM_URL` usam o padrão do código = web-production-97918.)
+- ⚠️ Senhas/chaves ficam **só no Railway** (nunca no GitHub).
 
 ---
 
